@@ -2,7 +2,7 @@
 
 ====================================
 
-📞 San Dial – Simple Android Phone Dialer
+📞 San Dial – Simple Android Phone Dialer  2
 
 San Dial is a lightweight, clean, and modern Android phone dialer app focused on simplicity, speed, and usability.
 It provides an easy-to-use dial pad, call history, contacts access, and a Favorites contacts feature for quick calling.
