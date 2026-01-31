@@ -1,6 +1,6 @@
 # Android_Application List 
 
-====================================
+==================================
 
 📞 San Dial – Simple Android Phone Dialer  2
 
