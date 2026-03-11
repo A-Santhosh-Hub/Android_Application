@@ -7,8 +7,8 @@ Firecracker Order ## SanCracker
 
 ### 📸 Preview
 
-<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg" width="220">
-<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s1.jpg" width="220">
+<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg" width="220"><img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s1.jpg" width="220">
+
 
 
 
