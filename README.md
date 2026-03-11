@@ -24,196 +24,44 @@ Firecracker Order ## SanCracker
 
 📞 San Dial – Simple Android Phone Dialer  2
 
-San Dial is a lightweight, clean, and modern Android phone dialer app focused on simplicity, speed, and usability.
-It provides an easy-to-use dial pad, call history, contacts access, and a Favorites contacts feature for quick calling.
+# 📞 San Dial – Simple Android Phone Dialer
 
-Developed by SanStudio
+San Dial is a simple and lightweight Android phone dialer application designed for speed, clarity, and ease of use. The app provides a clean numeric dial pad that allows users to quickly enter phone numbers and make calls using the Android system dial function. It also gives access to recent call history, phone contacts, and favorite contacts for faster communication.
+
+The goal of San Dial is to provide a modern and minimal dialing experience without unnecessary complexity. The interface is designed with a clean layout, smooth navigation, and rounded UI elements to create a comfortable user experience. Users can easily search contacts, redial numbers from the call history, and save frequently used contacts in the favorites section for quick access.
+
+San Dial also supports light and dark mode themes to match the system appearance and improve usability in different lighting environments. The application is built using Kotlin in Android Studio with a structured MVVM architecture and local storage support.
+
+This project focuses on simplicity, performance, and a modern mobile UI design.
+
+Developed by **SanStudio**  
 🌐 https://sanstudio.neocities.org/
 
-✨ Features
-🔢 Dialer
+---
 
-Clean numeric dial pad (0–9, *, #)
+## App Screenshots
 
-Live number preview while typing
+<img src="screenshots/dialer.png" width="220">
+<img src="screenshots/recents.png" width="220">
+<img src="screenshots/contacts.png" width="220">
+<img src="screenshots/favorites.png" width="220">
+<img src="screenshots/darkmode.png" width="220">
 
-Backspace & clear input
+---
 
-Uses Android system dial intent (ACTION_DIAL)
+## Technology Used
 
-Smooth touch feedback & ripple effects
+- Kotlin  
+- Android Studio  
+- XML Layouts  
+- MVVM Architecture  
+- Room / SharedPreferences
 
-📜 Recents / Call Log
+---
 
-View recent calls (incoming, outgoing, missed)
+## License
 
-Tap to call again quickly
-
-Long-press options (call, add to favorites)
-
-👤 Contacts
-
-Access phone contacts
-
-Search contacts instantly
-
-Tap contact to dial
-
-Add/remove contacts from favorites
-
-⭐ Favorites
-
-Save frequently used contacts
-
-Add from Contacts, Recents, or Dialer
-
-Persistent storage (saved even after app restart)
-
-Clean list / grid UI
-
-One-tap calling
-
-Remove or edit favorite contacts
-
-🌙 Dark Mode
-
-Supports Light & Dark themes
-
-Can follow system theme
-
-🎨 UI / UX Design
-
-Minimal & modern 2025-style UI
-
-Rounded buttons and cards
-
-Calm accent color for call actions
-
-Bottom navigation for easy access
-
-Optimized for both phones & tablets
-
-🛠 Tech Stack
-
-Language: Kotlin
-
-IDE: Android Studio
-
-UI: XML Layouts
-
-Architecture: MVVM
-
-Local Storage: Room / SharedPreferences
-
-Permissions:
-
-Contacts
-
-Call Log (optional)
-
-Phone (optional for direct calling)
-
-📂 Project Structure
-SanDial/
-│
-├── ui/
-│   ├── dialer/
-│   ├── recents/
-│   ├── contacts/
-│   ├── favorites/
-│   └── settings/
-│
-├── viewmodel/
-│
-├── data/
-│   ├── model/
-│   ├── dao/
-│   └── repository/
-│
-├── utils/
-│
-└── MainActivity.kt
-
-🔐 Permissions Handling
-
-App works even if permissions are denied
-
-Friendly permission prompts
-
-Graceful fallback UI for:
-
-No contacts permission
-
-No call log permission
-
-🚀 Getting Started
-Prerequisites
-
-Android Studio (latest recommended)
-
-Android device or emulator (API 23+)
-
-Steps
-
-Clone the repository:
-
-git clone https://github.com/yourusername/san-dial.git
-
-
-Open the project in Android Studio
-
-Sync Gradle files
-
-Run the app on a device or emulator
-
-📌 Branding
-
-Splash Screen:
-
-App name: San Dial
-
-Text: Developed by SanStudio
-
-About Screen:
-
-Clickable link to
-👉 https://sanstudio.neocities.org/
-
-Optional footer branding inside app
-
-📷 Screens (Optional)
-
-Add screenshots here later:
-
-Dialer Screen
-
-Recents
-
-Contacts
-
-Favorites
-
-Dark Mode
-
-🔮 Future Enhancements
-
-Direct calling (ACTION_CALL)
-
-Speed dial
-
-Call blocking
-
-Contact avatars sync
-
-Gesture-based dial actions
-
-Widget support
-
-👨‍💻 Developed By
-
-SanStudio
-🌐 https://sanstudio.neocities.org/
-
+This project is available for learning and personal use.
 📄 License
 
 This project is open for learning and personal use.
