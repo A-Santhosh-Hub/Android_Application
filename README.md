@@ -2,6 +2,26 @@
 
 =============================
 
+Firecracker Order ## SanCracker
+
+
+### 📸 Preview
+
+![SanCracker Screenshot 01](https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg)
+![SanCracker Screenshot 02](https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s1.jpg)
+
+
+
+
+
+
+
+
+
+
+
+
+
 📞 San Dial – Simple Android Phone Dialer  2
 
 San Dial is a lightweight, clean, and modern Android phone dialer app focused on simplicity, speed, and usability.
