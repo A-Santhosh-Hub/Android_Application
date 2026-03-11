@@ -25,11 +25,7 @@ Developed by **SanStudio**
 
 ## Screenshots
 
-<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg" width="220"> <img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s1.jpg" width="220">
-
-
-
-
+<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Multi%20Account%20Money%20Tracker/m1.jpg" width="220"><img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Multi%20Account%20Money%20Tracker/m2.jpg" width="220"><img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Multi%20Account%20Money%20Tracker/m3.jpg" width="220">
 
 
 
