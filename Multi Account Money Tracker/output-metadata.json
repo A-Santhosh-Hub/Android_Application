@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.santhosh.moneytracker",
+  "applicationId": "com.santhosh.sharedwallet",
   "variantName": "debug",
   "elements": [
     {
