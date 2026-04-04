@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Wallet - Multi Person Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        darkBg: '#0F172A',
+                        darkCard: '#1E293B',
+                        darkBorder: '#334155'
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        .dark .glass { background: rgba(30,41,59,0.7); border: 1px solid rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+        @keyframes slideUp { from { transform:translateY(20px); opacity:0 } to { transform:translateY(0); opacity:1 } }
+        .nav-item.active { background-color:#EEF2FF; color:#4F46E5; font-weight:600; }
+        .dark .nav-item.active { background-color:rgba(79,70,229,0.2); color:#818CF8; }
+        @keyframes pulse-ring { 0%{transform:scale(0.8);box-shadow:0 0 0 0 rgba(79,70,229,0.7)} 70%{transform:scale(1);box-shadow:0 0 0 10px rgba(79,70,229,0)} 100%{transform:scale(0.8);box-shadow:0 0 0 0 rgba(79,70,229,0)} }
+        .fab:hover { animation: pulse-ring 2s infinite; }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+        /* Toggle switch */
+        .toggle-on  { background-color: #10b981; }
+        .toggle-off { background-color: #cbd5e1; }
+        .dark .toggle-off { background-color: #475569; }
+        /* Sync spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-darkBg dark:text-slate-100 transition-colors duration-300 flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex w-20 lg:w-64 shrink-0 flex-col justify-between border-r border-slate-200 dark:border-darkBorder bg-white dark:bg-darkCard transition-colors z-20">
+        <div>
+            <div class="h-16 flex items-center justify-center lg:justify-between lg:px-6 border-b border-slate-200 dark:border-darkBorder cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" onclick="app.openWorkspaceModal()">
+                <div class="flex items-center">
+                    <i class="ph-fill ph-wallet text-primary text-2xl md:text-3xl"></i>
+                    <div class="ml-3 hidden lg:block">
+                        <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-0.5 leading-none">Account</p>
+                        <h1 class="font-bold text-sm truncate w-32 current-workspace-name">Main Account</h1>
+                    </div>
+                </div>
+                <i class="ph ph-caret-up-down text-slate-400 hidden lg:block"></i>
+            </div>
+            <nav class="p-2 lg:p-4 space-y-2 mt-4 overflow-y-auto max-h-[calc(100vh-250px)]">
+                <button onclick="app.navigate('dashboard')" class="nav-item active w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="dashboard"><i class="ph ph-squares-four text-2xl"></i><span class="ml-3 hidden lg:block">Dashboard</span></button>
+                <button onclick="app.navigate('transactions')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="transactions"><i class="ph ph-list-dashes text-2xl"></i><span class="ml-3 hidden lg:block">Transactions</span></button>
+                <button onclick="app.navigate('autopay')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="autopay"><i class="ph ph-arrows-clockwise text-2xl"></i><span class="ml-3 hidden lg:block">Auto Pay</span></button>
+                <button onclick="app.navigate('lent')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="lent"><i class="ph ph-hand-coins text-2xl"></i><span class="ml-3 hidden lg:block">Lent Tracker</span></button>
+                <button onclick="app.navigate('borrowed')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="borrowed"><i class="ph ph-hand-arrow-down text-2xl"></i><span class="ml-3 hidden lg:block">Borrowed Tracker</span></button>
+                <button onclick="app.navigate('users')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="users"><i class="ph ph-users text-2xl"></i><span class="ml-3 hidden lg:block">Users</span></button>
+                <button onclick="app.navigate('split')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="split"><i class="ph ph-scales text-2xl"></i><span class="ml-3 hidden lg:block">Fair Split</span></button>
+                <button onclick="app.navigate('summary')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="summary"><i class="ph ph-chart-pie-slice text-2xl"></i><span class="ml-3 hidden lg:block">Monthly Summary</span></button>
+                <button onclick="app.navigate('savings')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="savings"><i class="ph ph-piggy-bank text-2xl"></i><span class="ml-3 hidden lg:block">Savings</span></button>
+                <button onclick="app.navigate('settings')" class="nav-item w-full flex items-center p-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800" data-target="settings"><i class="ph ph-gear text-2xl"></i><span class="ml-3 hidden lg:block">Settings</span></button>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-darkBorder text-center lg:text-left text-sm text-slate-500 dark:text-slate-400">
+            <button onclick="app.toggleTheme()" class="w-full flex items-center justify-center lg:justify-start p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-4">
+                <i id="theme-icon" class="ph ph-moon text-2xl"></i>
+                <span id="theme-text" class="ml-3 hidden lg:block">Dark Mode</span>
+            </button>
+            <div class="hidden lg:block text-xs"><p>Developed By</p><a href="https://a-santhosh-hub.github.io/in/" target="_blank" class="font-semibold text-primary hover:underline">Santhosh A</a></div>
+            <a href="https://a-santhosh-hub.github.io/in/" target="_blank" class="block lg:hidden text-primary flex justify-center mt-2"><i class="ph ph-code text-2xl"></i></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
+        <header class="h-16 flex items-center justify-between px-4 md:px-6 border-b border-slate-200 dark:border-darkBorder bg-white/80 dark:bg-darkCard/80 backdrop-blur-md z-10 shrink-0">
+            <div class="flex items-center gap-2 overflow-hidden">
+                <button onclick="app.openWorkspaceModal()" class="md:hidden flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors mr-1">
+                    <i class="ph-fill ph-wallet text-primary"></i>
+                    <span class="text-xs font-semibold max-w-[80px] truncate current-workspace-name">Main</span>
+                    <i class="ph ph-caret-down text-xs text-slate-500"></i>
+                </button>
+                <h2 id="page-title" class="text-lg md:text-xl font-semibold capitalize truncate pr-2 hidden sm:block">Dashboard</h2>
+            </div>
+            <div class="flex items-center gap-2 md:gap-4 shrink-0">
+                <!-- Google Sheets Sync Status Pill -->
+                <div id="gsheets-header-pill" class="hidden items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-xs font-medium px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800/50">
+                    <div id="gsheets-pill-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                    <span id="gsheets-pill-text">Sheets Connected</span>
+                </div>
+                <button onclick="app.toggleTheme()" class="p-1.5 md:hidden rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400">
+                    <i id="theme-icon-mobile" class="ph ph-moon text-xl"></i>
+                </button>
+                <div id="month-filter-container" class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                    <button onclick="app.changeMonth(-1)" class="p-1 rounded hover:bg-white dark:hover:bg-slate-700"><i class="ph ph-caret-left"></i></button>
+                    <span id="current-month-display" class="px-1 md:px-3 text-xs md:text-sm font-medium w-24 md:w-32 text-center truncate">Current Month</span>
+                    <button onclick="app.changeMonth(1)" class="p-1 rounded hover:bg-white dark:hover:bg-slate-700"><i class="ph ph-caret-right"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <div id="export-content" class="flex-1 overflow-y-auto p-4 md:p-6 pb-36 md:pb-6">
+            <!-- DASHBOARD -->
+            <section id="view-dashboard" class="view-section slide-up max-w-7xl mx-auto w-full">
+                <div id="smart-alerts" class="mb-6 space-y-2 empty:hidden"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass p-6 rounded-2xl md:col-span-3 lg:col-span-1 relative overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg">
+                        <div class="relative z-10">
+                            <p class="text-indigo-100 text-sm font-medium mb-1">Total Net Balance</p>
+                            <h3 class="text-4xl font-bold tracking-tight" id="dash-total-balance">₹0</h3>
+                            <div class="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+                                <div><span class="opacity-80">Income:</span> <span class="font-semibold" id="dash-total-income">₹0</span></div>
+                                <div><span class="opacity-80">Expense:</span> <span class="font-semibold" id="dash-total-expense">₹0</span></div>
+                            </div>
+                        </div>
+                        <i class="ph ph-bank absolute -right-6 -bottom-6 text-9xl opacity-10"></i>
+                    </div>
+                    <div class="md:col-span-3 lg:col-span-2 flex gap-4 overflow-x-auto pb-2 snap-x" id="dash-user-balances"></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="glass p-5 rounded-2xl shadow-sm bg-white dark:bg-darkCard lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-lg">Income & Expenses</h3></div>
+                        <div class="h-64 relative w-full"><canvas id="barChart"></canvas></div>
+                    </div>
+                    <div class="glass p-5 rounded-2xl shadow-sm bg-white dark:bg-darkCard flex flex-col">
+                        <h3 class="font-semibold text-lg mb-4">Wallet Share</h3>
+                        <div class="flex-1 relative w-full flex items-center justify-center min-h-[200px]"><canvas id="doughnutChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="glass p-5 rounded-2xl shadow-sm bg-white dark:bg-darkCard">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Recent Transactions</h3>
+                        <button onclick="app.navigate('transactions')" class="text-primary text-sm font-medium hover:underline">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead><tr class="text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-darkBorder"><th class="pb-3 font-medium">Date</th><th class="pb-3 font-medium">User</th><th class="pb-3 font-medium">Details</th><th class="pb-3 font-medium text-right">Amount</th></tr></thead>
+                            <tbody id="dash-recent-tx" class="text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AUTO PAY -->
+            <section id="view-autopay" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1 flex items-center gap-2"><i class="ph ph-arrows-clockwise text-indigo-500"></i> Auto Pay</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Schedule automatic recurring payments for bills, subscriptions, or savings.</p>
+                    </div>
+                    <button onclick="app.openAutoPayModal()" class="bg-primary hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 font-medium shrink-0">
+                        <i class="ph ph-plus text-lg"></i> Setup Auto Pay
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="autopay-grid"></div>
+            </section>
+
+            <!-- LENT TRACKER -->
+            <section id="view-lent" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1">Lent Money Tracker</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Track partial and full repayments for money you've lent out.</p>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50 px-4 py-3 rounded-xl text-right shrink-0">
+                        <p class="text-xs text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider mb-0.5">Total Still Pending</p>
+                        <p class="text-2xl font-bold text-orange-700 dark:text-orange-300" id="lent-total-pending">₹0</p>
+                    </div>
+                </div>
+                
+                <h4 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="ph-fill ph-clock text-orange-500"></i> Active Loans</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="lent-active-grid"></div>
+
+                <h4 class="text-lg font-semibold mb-4 mt-8 flex items-center gap-2 border-t border-slate-200 dark:border-darkBorder pt-6"><i class="ph-fill ph-check-circle text-emerald-500"></i> Fully Settled</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80 hover:opacity-100 transition-opacity" id="lent-settled-grid"></div>
+            </section>
+
+            <!-- BORROWED TRACKER -->
+            <section id="view-borrowed" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1">Borrowed Tracker</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Track debts and money you owe to others, handle your repayments.</p>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 px-4 py-3 rounded-xl text-right shrink-0">
+                        <p class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-0.5">Total Still Owed</p>
+                        <p class="text-2xl font-bold text-blue-700 dark:text-blue-300" id="borrowed-total-pending">₹0</p>
+                    </div>
+                </div>
+                
+                <h4 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="ph-fill ph-clock text-blue-500"></i> Active Debts</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="borrowed-active-grid"></div>
+
+                <h4 class="text-lg font-semibold mb-4 mt-8 flex items-center gap-2 border-t border-slate-200 dark:border-darkBorder pt-6"><i class="ph-fill ph-check-circle text-emerald-500"></i> Fully Repaid</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80 hover:opacity-100 transition-opacity" id="borrowed-settled-grid"></div>
+            </section>
+
+            <!-- MONTHLY SUMMARY -->
+            <section id="view-summary" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="mb-6"><h3 class="text-xl font-semibold mb-2">Overall Account Monthly Breakdown</h3><p class="text-sm text-slate-500 dark:text-slate-400">Total transaction flow for the currently selected month across all users.</p></div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="summary-overall-cards"></div>
+                <div class="mb-6 border-t border-slate-200 dark:border-darkBorder pt-6"><h3 class="text-xl font-semibold mb-2">Breakdown By User</h3><p class="text-sm text-slate-500 dark:text-slate-400">Individual contributions and expenses for the selected month.</p></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="summary-users-grid"></div>
+            </section>
+
+            <!-- SAVINGS -->
+            <section id="view-savings" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="mb-6"><h3 class="text-xl font-semibold mb-2">Savings & Investments</h3><p class="text-sm text-slate-500 dark:text-slate-400">Money transferred to external savings accounts. This is deducted from your main wallet balance.</p></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="glass p-6 rounded-2xl relative overflow-hidden bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white shadow-lg">
+                        <div class="relative z-10">
+                            <p class="text-purple-100 text-sm font-medium mb-1">Total Savings (All Time)</p>
+                            <h3 class="text-4xl font-bold tracking-tight" id="save-total-all">₹0</h3>
+                            <div class="mt-4 pt-4 border-t border-white/20"><div><span class="opacity-80">Saved This Month:</span> <span class="font-semibold" id="save-total-month">₹0</span></div></div>
+                        </div>
+                        <i class="ph ph-piggy-bank absolute -right-6 -bottom-6 text-9xl opacity-10"></i>
+                    </div>
+                </div>
+                <div class="mb-6 border-t border-slate-200 dark:border-darkBorder pt-6">
+                    <h3 class="text-xl font-semibold mb-4">Savings By User</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="save-users-grid"></div>
+                </div>
+            </section>
+
+            <!-- TRANSACTIONS -->
+            <section id="view-transactions" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="glass p-5 rounded-2xl shadow-sm bg-white dark:bg-darkCard mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div class="relative w-full sm:w-64">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="tx-search" placeholder="Search note or category..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
+                        <select id="tx-filter-user" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none min-w-[120px]"><option value="all">All Users</option></select>
+                        <select id="tx-filter-type" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none">
+                            <option value="all">All Types</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                            <option value="lent">Lent (Given)</option>
+                            <option value="lent_returned">Lent Returned</option>
+                            <option value="borrowed">Borrowed (Received)</option>
+                            <option value="borrowed_returned">Repaid Borrowed</option>
+                            <option value="savings">Savings (Deposit)</option>
+                            <option value="withdraw_savings">Savings (Withdraw)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="glass rounded-2xl shadow-sm bg-white dark:bg-darkCard overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap">
+                            <thead><tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-darkBorder"><th class="p-4 font-medium">Date</th><th class="p-4 font-medium">User</th><th class="p-4 font-medium">Type</th><th class="p-4 font-medium">Category/Note</th><th class="p-4 font-medium text-right">Amount</th><th class="p-4 font-medium text-center">Action</th></tr></thead>
+                            <tbody id="tx-list-full" class="text-sm divide-y divide-slate-100 dark:divide-darkBorder"></tbody>
+                        </table>
+                        <div id="tx-empty-state" class="hidden flex-col items-center justify-center py-12 text-slate-400">
+                            <i class="ph ph-receipt text-6xl mb-3 opacity-50"></i><p>No transactions found</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- USERS -->
+            <section id="view-users" class="view-section hidden fade-in max-w-7xl mx-auto w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-slate-500 dark:text-slate-400">Manage wallet members and their details.</p>
+                    <button onclick="app.openUserModal()" class="bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center"><i class="ph ph-plus mr-2"></i> Add User</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="users-grid"></div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="view-settings" class="view-section hidden fade-in max-w-3xl mx-auto">
+                <!-- GOOGLE SHEETS INTEGRATION -->
+                <div class="glass p-6 rounded-2xl shadow-sm bg-white dark:bg-darkCard mb-6">
+                    <h3 class="text-lg font-semibold mb-4 border-b border-slate-200 dark:border-darkBorder pb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="currentColor"><path d="M19.565 3H4.435C3.091 3 2 4.09 2 5.435v13.13C2 19.909 3.091 21 4.435 21h15.13C20.909 21 22 19.909 22 18.565V5.435C22 4.09 20.909 3 19.565 3zM10 18H6v-2h4v2zm0-4H6v-2h4v2zm0-4H6V8h4v2zm8 8h-6v-2h6v2zm0-4h-6v-2h6v2zm0-4h-6V8h6v2z"/></svg>
+                        Google Sheets Integration
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-5 bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
+                        <i class="ph ph-info mr-1 text-primary"></i>
+                        Sync your wallet data to your own Google Sheet. Follow the 5 steps below — takes about 2 minutes!
+                    </p>
+                    <div class="space-y-5">
+                        <div class="flex gap-3 items-start">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Create a new Google Sheet</p>
+                                <a href="https://sheets.new" target="_blank" class="text-xs text-primary hover:underline mt-0.5 inline-flex items-center gap-1">Open sheets.new <i class="ph ph-arrow-square-out"></i></a>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Open Apps Script</p>
+                                <p class="text-xs text-slate-500 mt-0.5">In your sheet → click <strong>Extensions → Apps Script</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Paste the Connector Script</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Delete all existing code, paste this script, then click <strong>Save (💾)</strong></p>
+                                <button onclick="app.copyAppScript()" id="copy-script-btn"
+                                    class="mt-2 text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors font-medium border border-slate-200 dark:border-slate-600">
+                                    <i class="ph ph-copy text-base"></i> Copy Connector Script Code
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Deploy as Web App</p>
+                                <p class="text-xs text-slate-500 mt-1">Click <strong>Deploy → New Deployment</strong>, then set:</p>
+                                <div class="mt-1.5 ml-1 space-y-0.5">
+                                    <div class="flex items-center gap-2 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-primary inline-block shrink-0"></span> Type: <strong>Web App</strong></div>
+                                    <div class="flex items-center gap-2 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-primary inline-block shrink-0"></span> Execute as: <strong>Me</strong></div>
+                                    <div class="flex items-center gap-2 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-primary inline-block shrink-0"></span> Who has access: <strong>Anyone</strong></div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1.5">Click <strong>Deploy</strong> → allow permissions → <strong>Copy the Web App URL</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">5</div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm mb-2">Paste your Web App URL here</p>
+                                <div class="flex gap-2">
+                                    <input type="url" id="gsheets-url-input"
+                                        placeholder="https://script.google.com/macros/s/..."
+                                        class="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50 font-mono min-w-0">
+                                    <button onclick="app.saveGSheetsUrl()"
+                                        class="bg-primary hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0">
+                                        Save URL
+                                    </button>
+                                </div>
+                                <div id="gsheets-status" class="mt-2 text-xs hidden p-2 rounded-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="mt-6 pt-5 border-t border-slate-100 dark:border-darkBorder flex flex-col sm:flex-row gap-3">
+                        <button onclick="app.testGSheetsConnection()" id="gsheets-test-btn"
+                            class="flex-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                            <i class="ph ph-wifi-high text-lg"></i> Test Connection
+                        </button>
+                        <button onclick="app.syncToGoogleSheets()" id="gsheets-sync-btn"
+                            class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <i class="ph ph-arrows-clockwise text-lg"></i> Sync to Google Sheet Now
+                        </button>
+                    </div>
+                    <!-- Auto-sync toggle -->
+                    <div class="mt-3 flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-darkBorder">
+                        <div>
+                            <p class="text-sm font-medium">Auto-Sync on every Save</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Automatically push data to Google Sheet whenever you add a transaction</p>
+                        </div>
+                        <button onclick="app.toggleAutoSync()" id="autosync-toggle"
+                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shrink-0 ml-3">
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl shadow-sm bg-white dark:bg-darkCard mb-6">
+                    <h3 class="text-lg font-semibold mb-4 border-b border-slate-200 dark:border-darkBorder pb-2">Help & Support</h3>
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                        <div><h4 class="font-medium">App Tour</h4><p class="text-sm text-slate-500 dark:text-slate-400">Replay the introductory tour to learn how to use the app.</p></div>
+                        <button onclick="app.startTour()" class="bg-indigo-100 dark:bg-indigo-900/30 text-primary hover:bg-indigo-200 dark:hover:bg-indigo-800 px-4 py-2 rounded-lg shadow-sm transition-all flex items-center justify-center min-w-[140px] font-medium">
+                            <i class="ph ph-presentation-chart mr-2 text-xl"></i> Show Tour
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl shadow-sm bg-white dark:bg-darkCard mb-6">
+                    <h3 class="text-lg font-semibold mb-4 border-b border-slate-200 dark:border-darkBorder pb-2">Data & Backup</h3>
+                    <div class="space-y-6">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                            <div><h4 class="font-medium">Print Transactions (PDF)</h4><p class="text-sm text-slate-500 dark:text-slate-400">Generate a clean, printable history of the selected month.</p></div>
+                            <button onclick="app.exportPDF()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg shadow transition-all flex items-center justify-center min-w-[140px]"><i class="ph ph-printer mr-2 text-xl"></i> Print / PDF</button>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-t border-slate-100 dark:border-darkBorder pt-4">
+                            <div><h4 class="font-medium">Export Backup (Excel)</h4><p class="text-sm text-slate-500 dark:text-slate-400">Detailed multi-sheet Excel file with all transactions and totals.</p></div>
+                            <button onclick="app.exportExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition-all flex items-center justify-center min-w-[140px]"><i class="ph ph-file-xls mr-2 text-xl"></i> Export Excel</button>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-t border-slate-100 dark:border-darkBorder pt-4">
+                            <div><h4 class="font-medium">Export Backup (JSON)</h4><p class="text-sm text-slate-500 dark:text-slate-400">Save all your data to a file for safekeeping.</p></div>
+                            <button onclick="app.exportJSON()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition-all flex items-center justify-center min-w-[140px]"><i class="ph ph-download-simple mr-2 text-xl"></i> Download</button>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-t border-slate-100 dark:border-darkBorder pt-4">
+                            <div><h4 class="font-medium">Import Backup (JSON)</h4><p class="text-sm text-slate-500 dark:text-slate-400">Restore your data from a previous backup file.</p></div>
+                            <div class="relative min-w-[140px]">
+                                <input type="file" id="import-file" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.importJSON(event)">
+                                <button class="w-full bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg shadow transition-all flex items-center justify-center"><i class="ph ph-upload-simple mr-2 text-xl"></i> Upload File</button>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-t border-slate-100 dark:border-darkBorder pt-4">
+                            <div><h4 class="font-medium text-red-500">Danger Zone</h4><p class="text-sm text-slate-500 dark:text-slate-400">Permanently delete all data from this browser.</p></div>
+                            <button onclick="app.resetData()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition-all flex items-center justify-center min-w-[140px]"><i class="ph ph-trash mr-2 text-xl"></i> Reset Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-slate-500 text-sm mt-8">
+                    <p>Shared Wallet v1.4.0 — Auto Pay Integration</p>
+                    <p>Local Storage Active</p>
+                    <p class="mt-2 text-xs">Developed By <a href="https://a-santhosh-hub.github.io/in/" target="_blank" class="font-semibold text-primary hover:underline">Santhosh A</a></p>
+                </div>
+            </section>
+
+            <!-- SPLIT CALCULATOR -->
+            <section id="view-split" class="view-section hidden fade-in max-w-4xl mx-auto w-full">
+                <div class="glass p-6 rounded-2xl shadow-sm bg-white dark:bg-darkCard mb-6">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-primary"><i class="ph ph-scales text-xl"></i></div>
+                        <h3 class="text-xl font-semibold">Fair Proportional Split</h3>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 border-b border-slate-100 dark:border-darkBorder pb-4">Calculate how much each person should contribute to a target amount based on their current balance.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 items-end">
+                        <div class="flex-1 w-full">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Target Amount to Send/Pay (₹)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">₹</span>
+                                <input type="number" id="split-target" min="1" step="0.01" placeholder="e.g. 25000" class="w-full pl-8 pr-4 py-3 text-lg font-bold rounded-xl border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+                            </div>
+                        </div>
+                        <button onclick="app.calculateSplit()" class="w-full sm:w-auto bg-primary hover:bg-indigo-700 text-white px-8 py-3 rounded-xl shadow-md transition-all font-medium flex items-center justify-center gap-2 whitespace-nowrap">
+                            <i class="ph ph-calculator text-lg"></i> Calculate
+                        </button>
+                    </div>
+                </div>
+                <div id="split-results-container" class="hidden glass rounded-2xl shadow-sm bg-white dark:bg-darkCard overflow-hidden"></div>
+            </section>
+        </div>
+
+        <!-- FAB -->
+        <div id="draggable-fab" class="fixed bottom-20 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:bottom-10 md:right-10 z-30 touch-none">
+            <button class="fab w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:shadow-primary/50 flex items-center justify-center text-2xl transition-all cursor-move">
+                <i class="ph ph-plus pointer-events-none"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-darkCard/90 backdrop-blur-md border-t border-slate-200 dark:border-darkBorder flex justify-start items-center h-16 z-40 px-2 pb-safe overflow-x-auto gap-2">
+            <button onclick="app.navigate('dashboard')" class="nav-item active shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="dashboard"><i class="ph ph-squares-four text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Dash</span></button>
+            <button onclick="app.navigate('transactions')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="transactions"><i class="ph ph-list-dashes text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Activity</span></button>
+            <button onclick="app.navigate('autopay')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="autopay"><i class="ph ph-arrows-clockwise text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Auto Pay</span></button>
+            <button onclick="app.navigate('lent')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="lent"><i class="ph ph-hand-coins text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Lent</span></button>
+            <button onclick="app.navigate('borrowed')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="borrowed"><i class="ph ph-hand-arrow-down text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Borrowed</span></button>
+            <button onclick="app.navigate('summary')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="summary"><i class="ph ph-chart-pie-slice text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Summary</span></button>
+            <button onclick="app.navigate('users')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="users"><i class="ph ph-users text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Users</span></button>
+            <button onclick="app.navigate('split')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="split"><i class="ph ph-scales text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Split</span></button>
+            <button onclick="app.navigate('settings')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="settings"><i class="ph ph-gear text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Settings</span></button>
+            <button onclick="app.navigate('savings')" class="nav-item shrink-0 flex flex-col items-center justify-center w-[18%] sm:w-[14%] h-12 rounded-xl transition-all text-slate-500 dark:text-slate-400" data-target="savings"><i class="ph ph-piggy-bank text-xl mb-0.5"></i><span class="text-[9px] font-medium leading-none">Savings</span></button>
+        </nav>
+    </main>
+
+    <!-- Overlay -->
+    <div id="modal-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Tour Modal -->
+    <div id="modal-tour" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 overflow-hidden">
+        <div id="tour-icon-bg" class="h-32 bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center transition-colors duration-500">
+            <i id="tour-icon" class="ph-fill ph-hand-waving text-6xl text-indigo-500 transition-transform duration-500 scale-100"></i>
+        </div>
+        <div class="p-6 text-center relative">
+            <div id="tour-dots" class="flex justify-center gap-1.5 mb-4"></div>
+            <div id="tour-content-wrapper" class="transition-opacity duration-200">
+                <h3 id="tour-title" class="text-xl font-bold mb-2 text-slate-800 dark:text-slate-100">Welcome!</h3>
+                <p id="tour-text" class="text-slate-500 dark:text-slate-400 text-sm mb-6 min-h-[60px]">Loading...</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="app.skipTour()" class="w-1/3 text-slate-500 dark:text-slate-400 font-medium py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Skip</button>
+                <button onclick="app.nextTourStep()" id="tour-next-btn" class="w-2/3 bg-primary hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-md transition-colors">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workspace Modal -->
+    <div id="modal-workspace" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm max-h-[90dvh] overflow-y-auto glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold">Switch Account</h3>
+            <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i class="ph ph-x text-2xl"></i></button>
+        </div>
+        <div id="workspace-list" class="mb-6 max-h-60 overflow-y-auto pr-2"></div>
+        <div class="border-t border-slate-200 dark:border-darkBorder pt-4">
+            <form onsubmit="app.createWorkspace(event)" class="flex gap-2">
+                <input type="text" id="new-ws-name" required placeholder="New Account Name..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <button type="submit" class="bg-primary hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">Add</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Auto Pay Modal -->
+    <div id="modal-autopay" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md max-h-[90dvh] overflow-y-auto glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" id="autopay-modal-title">Setup Auto Pay</h3>
+            <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i class="ph ph-x text-2xl"></i></button>
+        </div>
+        <form id="autopay-form" onsubmit="app.saveAutoPay(event)" class="space-y-4">
+            <input type="hidden" id="ap-id">
+            
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Title / Name</label>
+                <input type="text" id="ap-title" required placeholder="e.g. Netflix, Rent, Maid..." class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Type</label>
+                    <select id="ap-type" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <option value="expense">Expense (Bill)</option>
+                        <option value="savings">Transfer to Savings</option>
+                        <option value="income">Income (Salary)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">User</label>
+                    <select id="ap-user" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Amount (₹)</label>
+                <input type="number" id="ap-amount" required min="1" step="0.01" placeholder="0.00" class="w-full px-3 py-2 text-lg font-semibold rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Frequency</label>
+                    <select id="ap-frequency" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <option value="monthly">Monthly</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="daily">Daily</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Next Payment Date</label>
+                    <input type="date" id="ap-next-date" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="app.closeModals()" class="w-1/3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-3 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" class="w-2/3 bg-primary hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2">Save Auto Pay</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="modal-transaction" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md max-h-[90dvh] overflow-y-auto glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" id="tx-modal-title">New Transaction</h3>
+            <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i class="ph ph-x text-2xl"></i></button>
+        </div>
+        <form id="tx-form" onsubmit="app.saveTransaction(event)" class="space-y-4">
+            <input type="hidden" id="tx-id">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Type</label>
+                    <select id="tx-type" required onchange="app.handleTxTypeChange()" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                        <option value="lent">Lent</option>
+                        <option value="lent_returned">Lent Returned (Inflow)</option>
+                        <option value="borrowed">Borrowed</option>
+                        <option value="borrowed_returned">Repaid Borrowed (Outflow)</option>
+                        <option value="savings">Transfer to Savings</option>
+                        <option value="withdraw_savings">Withdraw from Savings</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">User</label>
+                    <select id="tx-user" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Amount (₹)</label>
+                <input type="number" id="tx-amount" required min="1" step="0.01" placeholder="0.00" class="w-full px-3 py-2 text-lg font-semibold rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+            <div id="tx-category-group">
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1" id="tx-cat-label">Category</label>
+                <input type="text" id="tx-category" required placeholder="e.g. Food, Rent, Salary..." list="category-suggestions" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <datalist id="category-suggestions">
+                    <option value="Food & Dining"><option value="Housing & Rent"><option value="Transportation"><option value="Salary"><option value="Shopping"><option value="Utilities"><option value="Entertainment">
+                </datalist>
+            </div>
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Date</label>
+                <input type="date" id="tx-date" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Note (Optional)</label>
+                <input type="text" id="tx-note" placeholder="Short description..." class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="app.closeModals()" class="w-1/3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-3 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" id="tx-submit-btn" class="w-2/3 bg-primary hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2">Save Transaction</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Settle Loan/Debt Modal -->
+    <div id="modal-settle" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm max-h-[90dvh] overflow-y-auto glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" id="settle-title">Record Repayment</h3>
+            <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i class="ph ph-x text-2xl"></i></button>
+        </div>
+        <div id="settle-pending-box" class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg mb-4 text-sm border border-slate-200 dark:border-darkBorder">
+            Currently Pending: <strong id="settle-pending-display" class="text-lg ml-1">₹0</strong>
+        </div>
+        <form id="settle-form" onsubmit="app.saveSettlement(event)" class="space-y-4">
+            <input type="hidden" id="settle-parent-id">
+            <input type="hidden" id="settle-user-id">
+            <input type="hidden" id="settle-type"> <!-- 'lent' or 'borrowed' -->
+            
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1" id="settle-amount-label">Amount Returned Now (₹)</label>
+                <input type="number" id="settle-amount" required min="1" step="0.01" class="w-full px-3 py-2 text-lg font-semibold rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1" id="settle-date-label">Date</label>
+                <input type="date" id="settle-date" required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="app.closeModals()" class="w-1/3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-3 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" id="settle-submit-btn" class="w-2/3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- User Modal -->
+    <div id="modal-user" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm max-h-[90dvh] overflow-y-auto glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" id="user-modal-title">Add User</h3>
+            <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i class="ph ph-x text-2xl"></i></button>
+        </div>
+        <form id="user-form" onsubmit="app.saveUser(event)" class="space-y-4">
+            <input type="hidden" id="user-id">
+            <div><label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Name</label><input type="text" id="user-name" required placeholder="John Doe" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
+            <div><label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Theme Color</label><div class="flex items-center gap-3"><input type="color" id="user-color" value="#4F46E5" class="w-10 h-10 rounded cursor-pointer border-0 p-0 bg-transparent"><span class="text-xs text-slate-500">Used for charts and UI</span></div></div>
+            <div><label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">Salary Day (1-31)</label><input type="number" id="user-salary" min="1" max="31" placeholder="e.g. 5" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-darkBorder bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="app.closeModals()" class="w-1/3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-3 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" class="w-2/3 bg-primary hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-md transition-colors">Save User</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="modal-confirm" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm glass bg-white dark:bg-darkCard rounded-2xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 p-6 text-center">
+        <div class="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4 border border-red-200 dark:border-red-800/50"><i class="ph ph-warning-circle text-3xl text-red-500"></i></div>
+        <h3 class="text-xl font-bold mb-2" id="confirm-title">Are you sure?</h3>
+        <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm" id="confirm-msg">This action cannot be undone.</p>
+        <div class="flex gap-3">
+            <button onclick="app.closeModals()" class="w-1/2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-3 rounded-xl transition-colors">Cancel</button>
+            <button onclick="app.executeConfirm()" class="w-1/2 bg-red-500 hover:bg-red-600 text-white font-medium py-3 rounded-xl shadow-md transition-colors">Yes, Delete</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-4 right-4 bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-50 flex items-center gap-2">
+        <i id="toast-icon" class="ph ph-check-circle text-emerald-400 text-xl"></i>
+        <span id="toast-msg">Success</span>
+    </div>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    //  SHARED WALLET APP — v1.4.0 with Auto Pay Integration
+    //  Developed by Santhosh A | https://a-santhosh-hub.github.io/in/
+    // ═══════════════════════════════════════════════════════════
+
+    // ─── The connector script that gets copied to Apps Script ───
+    const APPS_SCRIPT_CODE = `// ============================================================
+//  SHARED WALLET — Google Sheets Connector
+//  Developed by Santhosh A | https://a-santhosh-hub.github.io/in/
+//  Paste this entire code in Apps Script, save, then deploy
+//  as a Web App (Anyone can access). Copy the Web App URL.
+// ============================================================
+
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(15000);
+  try {
+    var payload = JSON.parse(e.postData.contents);
+    if (payload.action === 'sync') {
+      writeAllSheets(payload);
+      return jsonOut({ status: 'success', message: 'Synced ' + (payload.transactions||[]).length + ' transactions.' });
+    }
+    return jsonOut({ status: 'error', message: 'Unknown action.' });
+  } catch(err) {
+    return jsonOut({ status: 'error', message: err.toString() });
+  } finally { lock.releaseLock(); }
+}
+
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    return jsonOut({ status: 'ok', sheetName: ss.getName(), message: 'Connection successful!' });
+  } catch(err) { return jsonOut({ status: 'error', message: err.toString() }); }
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function writeAllSheets(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var users = data.users||[], transactions = data.transactions||[], wsName = data.workspaceName||'Shared Wallet';
+  writeTxSheet(ss, users, transactions);
+  writeUsersSheet(ss, users, transactions);
+  writeMonthlySheet(ss, transactions);
+  writeInfoSheet(ss, wsName, users.length, transactions.length);
+}
+
+function writeTxSheet(ss, users, transactions) {
+  var s = ss.getSheetByName('Transactions') || ss.insertSheet('Transactions');
+  s.clearContents(); s.clearFormats();
+  var h = ['Date','User','Type','Category / Note','Amount (INR)','Extra Note'];
+  styleHeader(s, h, '#4F46E5');
+  if (!transactions.length) return;
+  var typeMap = {income:'Income',expense:'Expense',lent:'Lent',lent_returned:'Lent Returned',borrowed:'Borrowed',borrowed_returned:'Borrowed Repaid',savings:'Transfer to Savings',withdraw_savings:'Withdrawn from Savings'};
+  var rows = transactions.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);}).map(function(tx){
+    var u = users.find(function(u){return u.id===tx.userId;}); 
+    return [fmtDate(tx.date), u?u.name:'Unknown', typeMap[tx.type]||tx.type, tx.category||'', Number(tx.amount), tx.note||''];
+  });
+  s.getRange(2,1,rows.length,h.length).setValues(rows);
+  s.getRange(2,5,rows.length,1).setNumberFormat('₹#,##0.00');
+  for(var i=0;i<rows.length;i++) s.getRange(i+2,1,1,h.length).setBackground(i%2===0?'#F8F7FF':'#FFFFFF');
+  s.autoResizeColumns(1,h.length); s.setFrozenRows(1);
+}
+
+function writeUsersSheet(ss, users, transactions) {
+  var s = ss.getSheetByName('Users') || ss.insertSheet('Users');
+  s.clearContents(); s.clearFormats();
+  var h = ['User','Net Balance','Total Income','Total Expense','Net Lent','Net Borrowed','Net Savings','Salary Day'];
+  styleHeader(s, h, '#10b981');
+  if(!users.length) return;
+  var rows = users.map(function(u){
+    var inc=0,exp=0,lnt=0,brw=0,sav=0;
+    transactions.forEach(function(tx){
+      if(tx.userId!==u.id) return;
+      var a=Number(tx.amount);
+      if(tx.type==='income') inc+=a;
+      if(tx.type==='expense') exp+=a;
+      if(tx.type==='lent') lnt+=a;
+      if(tx.type==='lent_returned') lnt-=a; // Returning lent money decreases your total outstanding lent amount
+      if(tx.type==='borrowed') brw+=a;
+      if(tx.type==='borrowed_returned') brw-=a; // Paying back borrowed money decreases what you owe
+      if(tx.type==='savings') sav+=a;
+      if(tx.type==='withdraw_savings') sav-=a;
+    });
+    return [u.name,(inc+brw)-(exp+lnt+sav),inc,exp,lnt,brw,sav,u.salaryDate||'Not Set'];
+  });
+  s.getRange(2,1,rows.length,h.length).setValues(rows);
+  s.getRange(2,2,rows.length,6).setNumberFormat('₹#,##0.00');
+  rows.forEach(function(r,i){ if(Number(r[1])<0) s.getRange(i+2,2).setFontColor('#ef4444').setFontWeight('bold'); });
+  for(var i=0;i<rows.length;i++) s.getRange(i+2,1,1,h.length).setBackground(i%2===0?'#F0FDF4':'#FFFFFF');
+  s.autoResizeColumns(1,h.length); s.setFrozenRows(1);
+}
+
+function writeMonthlySheet(ss, transactions) {
+  var s = ss.getSheetByName('Monthly Summary') || ss.insertSheet('Monthly Summary');
+  s.clearContents(); s.clearFormats();
+  var h = ['Month','Income','Expense','Net Lent','Net Borrowed','Net Savings','Net Flow'];
+  styleHeader(s, h, '#8b5cf6');
+  var map={};
+  transactions.forEach(function(tx){
+    var d=new Date(tx.date), k=d.getFullYear()+'-'+pad(d.getMonth()+1);
+    if(!map[k]) map[k]={label:d.toLocaleString('en-GB',{month:'short',year:'numeric'}),inc:0,exp:0,lnt:0,brw:0,sav:0};
+    var a=Number(tx.amount);
+    if(tx.type==='income') map[k].inc+=a;
+    if(tx.type==='expense') map[k].exp+=a;
+    if(tx.type==='lent') map[k].lnt+=a;
+    if(tx.type==='lent_returned') map[k].lnt-=a; 
+    if(tx.type==='borrowed') map[k].brw+=a;
+    if(tx.type==='borrowed_returned') map[k].brw-=a;
+    if(tx.type==='savings') map[k].sav+=a;
+    if(tx.type==='withdraw_savings') map[k].sav-=a;
+  });
+  var keys=Object.keys(map).sort().reverse();
+  if(!keys.length) return;
+  var rows=keys.map(function(k){ var m=map[k],nf=(m.inc+m.brw)-(m.exp+m.lnt+m.sav); return [m.label,m.inc,m.exp,m.lnt,m.brw,m.sav,nf]; });
+  s.getRange(2,1,rows.length,h.length).setValues(rows);
+  s.getRange(2,2,rows.length,6).setNumberFormat('₹#,##0.00');
+  rows.forEach(function(r,i){ s.getRange(i+2,7).setFontColor(Number(r[6])>=0?'#10b981':'#ef4444').setFontWeight('bold'); });
+  for(var i=0;i<rows.length;i++) s.getRange(i+2,1,1,h.length).setBackground(i%2===0?'#FAF5FF':'#FFFFFF');
+  s.autoResizeColumns(1,h.length); s.setFrozenRows(1);
+}
+
+function writeInfoSheet(ss, wsName, uCount, txCount) {
+  var s = ss.getSheetByName('Info') || ss.insertSheet('Info');
+  s.clearContents(); s.clearFormats();
+  var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd MMM yyyy, hh:mm a');
+  var info=[['Shared Wallet — Google Sheets Connector',''],['',''],['Last Synced',now],['Workspace',wsName],['Total Users',uCount],['Total Transactions',txCount],['',''],['Developed By','Santhosh A'],['Portfolio','https://a-santhosh-hub.github.io/in/']];
+  s.getRange(1,1,info.length,2).setValues(info);
+  s.getRange(1,1).setFontWeight('bold').setFontSize(13).setFontColor('#4F46E5');
+  s.getRange(3,1,6,1).setFontWeight('bold');
+  s.autoResizeColumns(1,2);
+}
+
+function styleHeader(sheet, headers, bg) {
+  var r = sheet.getRange(1,1,1,headers.length);
+  r.setValues([headers]).setBackground(bg).setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(11);
+}
+function fmtDate(d) { return Utilities.formatDate(new Date(d), Session.getScriptTimeZone(), 'dd MMM yyyy'); }
+function pad(n) { return String(n).padStart(2,'0'); }`;
+
+    const app = {
+        workspaces: [],
+        activeWorkspaceId: null,
+        editingWorkspaceId: null,
+        data: null,
+        settings: { darkMode: false, gsheetsUrl: '', autoSync: false },
+        currentView: 'dashboard',
+        currentDate: new Date(),
+        charts: { bar: null, doughnut: null },
+        pendingAction: null,
+
+        tourSteps: [
+            { icon: 'ph-hand-waving', bg: 'bg-indigo-100 dark:bg-indigo-900/30', color: 'text-indigo-500', title: 'Welcome to Shared Wallet', text: 'Manage shared finances securely in your browser. All data is stored locally with no sign-ups required!' },
+            { icon: 'ph-users', bg: 'bg-emerald-100 dark:bg-emerald-900/30', color: 'text-emerald-500', title: '1. Add Users', text: 'Start by navigating to the "Users" tab to add yourself and anyone else you are sharing finances with.' },
+            { icon: 'ph-plus-circle', bg: 'bg-blue-100 dark:bg-blue-900/30', color: 'text-blue-500', title: '2. Track Everything', text: 'Use the floating + button to log Income, Expenses, Lent, Borrowed, or Transfers to Savings.' },
+            { icon: 'ph-arrows-clockwise', bg: 'bg-purple-100 dark:bg-purple-900/30', color: 'text-purple-500', title: '3. Auto Pay', text: 'Setup automatic recurring transactions (Bills, Subscriptions, Salary) so you never have to add them manually again!' },
+            { icon: 'ph-google-logo', bg: 'bg-green-100 dark:bg-green-900/30', color: 'text-green-500', title: '4. Google Sheets Sync', text: 'Connect your own Google Sheet via Settings to auto-backup all your data with one click — no account needed!' }
+        ],
+        currentTourStep: 0,
+
+        fmtCurrency: (num) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(num || 0),
+        fmtDate: (dateStr) => new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(dateStr)),
+        formatDateForInput: (d) => { const yr = d.getFullYear(); const mo = String(d.getMonth() + 1).padStart(2, '0'); const da = String(d.getDate()).padStart(2, '0'); return `${yr}-${mo}-${da}`; },
+
+        // ═══════════════════════════════════════════════
+        //  GOOGLE SHEETS INTEGRATION METHODS
+        // ═══════════════════════════════════════════════
+
+        copyAppScript() {
+            navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
+                const btn = document.getElementById('copy-script-btn');
+                btn.innerHTML = '<i class="ph ph-check text-emerald-500"></i> Copied!';
+                btn.classList.add('border-emerald-300', 'text-emerald-600');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="ph ph-copy text-base"></i> Copy Connector Script Code';
+                    btn.classList.remove('border-emerald-300', 'text-emerald-600');
+                }, 2500);
+                this.showToast('Script copied! Now paste it in Apps Script.');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = APPS_SCRIPT_CODE;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                this.showToast('Script copied!');
+            });
+        },
+
+        saveGSheetsUrl() {
+            const input = document.getElementById('gsheets-url-input');
+            const url = (input.value || '').trim();
+            if (url && !url.startsWith('https://script.google.com/macros/s/')) {
+                this.showGSheetsStatus('error', '<i class="ph ph-warning mr-1"></i>That doesn\'t look like a valid Apps Script URL. It should start with https://script.google.com/macros/s/');
+                return;
+            }
+            this.settings.gsheetsUrl = url;
+            this.saveData();
+            this.updateGSheetsUI();
+            if (url) {
+                this.showGSheetsStatus('success', '<i class="ph ph-check-circle mr-1"></i>URL saved! Click "Test Connection" to verify it works.');
+                this.showToast('Google Sheets URL saved!');
+            } else {
+                this.showGSheetsStatus('info', '<i class="ph ph-info mr-1"></i>URL cleared. Google Sheets sync is now disabled.');
+                this.showToast('URL cleared.');
+            }
+        },
+
+        async testGSheetsConnection() {
+            const url = this.settings.gsheetsUrl;
+            if (!url) {
+                this.showGSheetsStatus('error', '<i class="ph ph-warning mr-1"></i>No URL saved. Please paste your Web App URL and click "Save URL" first.');
+                return;
+            }
+            const btn = document.getElementById('gsheets-test-btn');
+            btn.innerHTML = '<i class="ph ph-spinner spin text-lg"></i> Testing...';
+            btn.disabled = true;
+            try {
+                const res = await fetch(url, { method: 'GET' });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    this.showGSheetsStatus('success', `<i class="ph ph-check-circle mr-1"></i>Connected! Sheet: <strong>${data.sheetName}</strong>`);
+                    this.showToast('Connection successful!');
+                } else {
+                    this.showGSheetsStatus('error', `<i class="ph ph-x-circle mr-1"></i>Error: ${data.message}`);
+                }
+            } catch (err) {
+                this.showGSheetsStatus('error', '<i class="ph ph-x-circle mr-1"></i>Could not reach the Apps Script URL. Make sure you deployed it with "Anyone" access.');
+            } finally {
+                btn.innerHTML = '<i class="ph ph-wifi-high text-lg"></i> Test Connection';
+                btn.disabled = false;
+            }
+        },
+
+        async syncToGoogleSheets(silent = false) {
+            const url = this.settings.gsheetsUrl;
+            if (!url) {
+                if (!silent) {
+                    this.showGSheetsStatus('error', '<i class="ph ph-warning mr-1"></i>No Google Sheets URL saved. Please complete the setup first.');
+                    this.navigate('settings');
+                }
+                return;
+            }
+            const btn = document.getElementById('gsheets-sync-btn');
+            const pillText = document.getElementById('gsheets-pill-text');
+            const pillDot  = document.getElementById('gsheets-pill-dot');
+            if (btn) { btn.innerHTML = '<i class="ph ph-arrows-clockwise spin text-lg"></i> Syncing...'; btn.disabled = true; }
+            if (pillText) pillText.textContent = 'Syncing...';
+            if (pillDot)  pillDot.classList.replace('bg-emerald-500', 'bg-amber-400');
+            const payload = { action: 'sync', workspaceName: this.data.name, users: this.data.users, transactions: this.data.transactions };
+            try {
+                const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    if (!silent) {
+                        this.showGSheetsStatus('success', `<i class="ph ph-check-circle mr-1"></i>${data.message}`);
+                        this.showToast('Synced to Google Sheets!');
+                    }
+                    this.settings.lastSync = new Date().toLocaleString('en-IN');
+                    this.saveData();
+                    if (pillText) pillText.textContent = 'Sheets Synced';
+                    if (pillDot)  pillDot.classList.replace('bg-amber-400', 'bg-emerald-500');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (err) {
+                if (!silent) {
+                    this.showGSheetsStatus('error', `<i class="ph ph-x-circle mr-1"></i>Sync failed: ${err.message}`);
+                    this.showToast('Sync failed. Check your URL.', 'error');
+                }
+                if (pillText) pillText.textContent = 'Sync Failed';
+                if (pillDot)  pillDot.classList.replace('bg-amber-400', 'bg-red-500');
+            } finally {
+                if (btn) { btn.innerHTML = '<i class="ph ph-arrows-clockwise text-lg"></i> Sync to Google Sheet Now'; btn.disabled = false; }
+            }
+        },
+
+        toggleAutoSync() {
+            this.settings.autoSync = !this.settings.autoSync;
+            this.saveData();
+            this.updateAutoSyncToggle();
+            this.showToast(this.settings.autoSync ? 'Auto-Sync enabled!' : 'Auto-Sync disabled.');
+        },
+
+        updateAutoSyncToggle() {
+            const btn = document.getElementById('autosync-toggle');
+            if (!btn) return;
+            if (this.settings.autoSync) {
+                btn.className = 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shrink-0 ml-3 toggle-on';
+                btn.innerHTML = '<span class="inline-block w-4 h-4 transform translate-x-6 rounded-full bg-white shadow transition-transform"></span>';
+            } else {
+                btn.className = 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shrink-0 ml-3 toggle-off';
+                btn.innerHTML = '<span class="inline-block w-4 h-4 transform translate-x-1 rounded-full bg-white shadow transition-transform"></span>';
+            }
+        },
+
+        showGSheetsStatus(type, html) {
+            const el = document.getElementById('gsheets-status');
+            if (!el) return;
+            const classes = {
+                success: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50',
+                error:   'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/50',
+                info:    'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50'
+            };
+            el.className = `mt-2 text-xs p-2 rounded-lg ${classes[type] || classes.info}`;
+            el.innerHTML = html;
+            el.classList.remove('hidden');
+        },
+
+        updateGSheetsUI() {
+            const input = document.getElementById('gsheets-url-input');
+            if (input && this.settings.gsheetsUrl) input.value = this.settings.gsheetsUrl;
+            const pill = document.getElementById('gsheets-header-pill');
+            if (pill) {
+                if (this.settings.gsheetsUrl) pill.classList.replace('hidden', 'flex');
+                else pill.classList.replace('flex', 'hidden');
+            }
+            this.updateAutoSyncToggle();
+        },
+
+        // ═══════════════════════════════════════════════
+        //  CORE APP LOGIC
+        // ═══════════════════════════════════════════════
+
+        init() {
+            const savedWorkspaces = localStorage.getItem('wallet_workspaces');
+            const activeWsId      = localStorage.getItem('wallet_active_ws');
+            const savedSettings   = localStorage.getItem('wallet_settings');
+
+            if (savedSettings) {
+                const parsed = JSON.parse(savedSettings);
+                this.settings = Object.assign({ darkMode: false, gsheetsUrl: '', autoSync: false }, parsed);
+                if (this.settings.darkMode) document.documentElement.classList.add('dark');
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+                this.settings.darkMode = true;
+            }
+
+            this.updateThemeUI();
+
+            if (savedWorkspaces) {
+                this.workspaces = JSON.parse(savedWorkspaces);
+                this.activeWorkspaceId = activeWsId || this.workspaces[0].id;
+            } else {
+                const oldUsers = localStorage.getItem('wallet_users');
+                const oldTx    = localStorage.getItem('wallet_transactions');
+                const defaultWs = {
+                    id: 'ws_' + Date.now(),
+                    name: 'Main Account',
+                    users: oldUsers ? JSON.parse(oldUsers) : [
+                        { id: 'u1', name: 'Me',      color: '#4F46E5', salaryDate: 5 },
+                        { id: 'u2', name: 'Partner', color: '#ec4899', salaryDate: 10 }
+                    ],
+                    transactions: oldTx ? JSON.parse(oldTx) : [],
+                    autoPays: []
+                };
+                this.workspaces = [defaultWs];
+                this.activeWorkspaceId = defaultWs.id;
+            }
+
+            this.syncDataPointer();
+
+            document.getElementById('tx-search').addEventListener('input', () => this.renderTransactions());
+            document.getElementById('tx-filter-user').addEventListener('change', () => this.renderTransactions());
+            document.getElementById('tx-filter-type').addEventListener('change', () => this.renderTransactions());
+            document.getElementById('tx-date').valueAsDate = new Date();
+
+            this.setupDraggableFab();
+            this.renderAll();
+            this.updateGSheetsUI();
+            this.initTour();
+        },
+
+        initTour() {
+            if (!localStorage.getItem('wallet_tour_completed')) setTimeout(() => this.startTour(), 800);
+        },
+        startTour() { this.currentTourStep = 0; this.renderTourStep(); this.openModal('modal-tour'); },
+        renderTourStep() {
+            const step = this.tourSteps[this.currentTourStep];
+            document.getElementById('tour-icon').className = `ph-fill ${step.icon} text-6xl ${step.color} transition-transform duration-500 scale-100`;
+            document.getElementById('tour-icon-bg').className = `h-32 ${step.bg} flex items-center justify-center transition-colors duration-500`;
+            document.getElementById('tour-title').innerText = step.title;
+            document.getElementById('tour-text').innerText = step.text;
+            let dotsHtml = '';
+            this.tourSteps.forEach((_, i) => { dotsHtml += `<div class="w-2 h-2 rounded-full transition-colors duration-300 ${i === this.currentTourStep ? 'bg-primary w-4' : 'bg-slate-200 dark:bg-slate-700'}"></div>`; });
+            document.getElementById('tour-dots').innerHTML = dotsHtml;
+            document.getElementById('tour-next-btn').innerText = this.currentTourStep === this.tourSteps.length - 1 ? 'Get Started' : 'Next';
+        },
+        nextTourStep() {
+            if (this.currentTourStep < this.tourSteps.length - 1) {
+                this.currentTourStep++;
+                const wrapper = document.getElementById('tour-content-wrapper');
+                const icon    = document.getElementById('tour-icon');
+                wrapper.classList.add('opacity-0'); icon.classList.add('scale-50', 'opacity-0');
+                setTimeout(() => { this.renderTourStep(); wrapper.classList.remove('opacity-0'); icon.classList.remove('scale-50', 'opacity-0'); }, 200);
+            } else { this.skipTour(); }
+        },
+        skipTour() { localStorage.setItem('wallet_tour_completed', 'true'); this.closeModals(); },
+
+        syncDataPointer() {
+            const ws = this.workspaces.find(w => w.id === this.activeWorkspaceId) || this.workspaces[0];
+            this.activeWorkspaceId = ws.id;
+            this.data = ws;
+            // Initialize autoPays array if missing from older save data
+            if (!this.data.autoPays) this.data.autoPays = [];
+            
+            document.querySelectorAll('.current-workspace-name').forEach(el => el.innerText = ws.name);
+            
+            // Run the AutoPay Cron engine immediately after pointer is synced
+            this.processAutoPays();
+        },
+
+        // ═══════════════════════════════════════════════
+        //  AUTO PAY ENGINE & UI
+        // ═══════════════════════════════════════════════
+
+        processAutoPays() {
+            let generatedCount = 0;
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            this.data.autoPays.forEach(ap => {
+                if (!ap.active) return;
+                
+                // Parse local date correctly
+                const parts = ap.nextDate.split('-');
+                let nextD = new Date(parts[0], parts[1] - 1, parts[2]);
+                nextD.setHours(0,0,0,0);
+                
+                // Safe loop limit to prevent infinite loops on crazy dates
+                let maxIterations = 0; 
+                while (nextD <= today && maxIterations < 100) {
+                    // Inject new transaction
+                    this.data.transactions.push({
+                        id: 'tx_auto_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        type: ap.type || 'expense',
+                        userId: ap.userId,
+                        amount: Number(ap.amount),
+                        category: ap.title,
+                        date: this.formatDateForInput(nextD),
+                        note: 'Auto-paid (' + ap.frequency + ')'
+                    });
+                    generatedCount++;
+                    
+                    // Increment the date logically
+                    if (ap.frequency === 'daily') nextD.setDate(nextD.getDate() + 1);
+                    else if (ap.frequency === 'weekly') nextD.setDate(nextD.getDate() + 7);
+                    else if (ap.frequency === 'monthly') nextD.setMonth(nextD.getMonth() + 1);
+                    else if (ap.frequency === 'yearly') nextD.setFullYear(nextD.getFullYear() + 1);
+                    
+                    maxIterations++;
+                }
+                
+                ap.nextDate = this.formatDateForInput(nextD);
+            });
+
+            if (generatedCount > 0) {
+                this.saveData();
+                setTimeout(() => {
+                    this.showToast(`Auto-Pay generated ${generatedCount} new transaction(s)!`);
+                    if (this.settings.autoSync && this.settings.gsheetsUrl) {
+                        this.syncToGoogleSheets(true); 
+                    }
+                }, 1000);
+            }
+        },
+
+        renderAutoPays() {
+            const grid = document.getElementById('autopay-grid');
+            if (!grid) return;
+            
+            let html = '';
+            this.data.autoPays.forEach(ap => {
+                const user = this.data.users.find(u => u.id === ap.userId) || { name: '?', color: '#ccc' };
+                let typeColor = 'text-red-500';
+                if(ap.type === 'income') typeColor = 'text-emerald-500';
+                if(ap.type === 'savings') typeColor = 'text-purple-500';
+
+                html += `
+                    <div class="glass p-5 rounded-2xl bg-white dark:bg-darkCard shadow-sm border border-slate-200 dark:border-darkBorder relative overflow-hidden group hover:border-primary/30 transition-colors">
+                        <div class="flex justify-between items-start mb-3 border-b border-slate-100 dark:border-darkBorder pb-3">
+                            <div class="${ap.active ? '' : 'opacity-50'}">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-slate-100 truncate w-32" title="${ap.title}">${ap.title}</h4>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <div class="w-2.5 h-2.5 rounded-full" style="background-color:${user.color}"></div>
+                                    <span class="text-slate-600 dark:text-slate-400 capitalize">${user.name} • ${ap.frequency}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold ${typeColor} text-xl">${this.fmtCurrency(ap.amount)}</p>
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1">${ap.type}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="text-sm">
+                                <span class="text-slate-500">Next:</span>
+                                <span class="font-semibold ${ap.active ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'}">${this.fmtDate(ap.nextDate)}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button onclick="app.deleteAutoPay('${ap.id}')" class="text-slate-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity"><i class="ph ph-trash text-lg"></i></button>
+                                <button onclick="app.toggleAutoPay('${ap.id}')" class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none shrink-0 ${ap.active ? 'toggle-on' : 'toggle-off'}">
+                                    <span class="inline-block w-3.5 h-3.5 transform ${ap.active ? 'translate-x-5' : 'translate-x-1'} rounded-full bg-white shadow transition-transform"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html || `<div class="col-span-full p-8 text-center text-slate-500 dark:text-slate-400 glass rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">No Auto Pays setup yet. Add bills or regular transfers!</div>`;
+        },
+
+        openAutoPayModal() {
+            if (!this.data.users.length) { this.showToast('Please add a user first!', 'error'); this.navigate('users'); return; }
+            document.getElementById('autopay-form').reset();
+            document.getElementById('ap-id').value = '';
+            document.getElementById('ap-next-date').valueAsDate = new Date();
+            
+            // Populate users
+            const userSelect = document.getElementById('ap-user');
+            userSelect.innerHTML = this.data.users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+            
+            this.openModal('modal-autopay');
+        },
+
+        saveAutoPay(e) {
+            e.preventDefault();
+            const id = document.getElementById('ap-id').value;
+            const ap = {
+                id: id || 'ap_' + Date.now(),
+                title: document.getElementById('ap-title').value,
+                type: document.getElementById('ap-type').value,
+                userId: document.getElementById('ap-user').value,
+                amount: Number(document.getElementById('ap-amount').value),
+                frequency: document.getElementById('ap-frequency').value,
+                nextDate: document.getElementById('ap-next-date').value,
+                active: true
+            };
+            
+            if (id) { const idx = this.data.autoPays.findIndex(t => t.id === id); if(idx !== -1) this.data.autoPays[idx] = ap; }
+            else this.data.autoPays.push(ap);
+            
+            this.saveData();
+            this.closeModals();
+            this.processAutoPays(); // Checks if the newly added one is due today
+            this.renderAll();
+            this.showToast('Auto Pay saved successfully!');
+        },
+
+        toggleAutoPay(id) {
+            const ap = this.data.autoPays.find(a => a.id === id);
+            if (ap) {
+                ap.active = !ap.active;
+                this.saveData();
+                this.renderAll();
+                this.showToast(ap.active ? 'Auto Pay resumed.' : 'Auto Pay paused.');
+            }
+        },
+
+        deleteAutoPay(id) {
+            this.confirmAction('Delete Auto Pay?', 'Are you sure you want to remove this recurring payment?', () => {
+                this.data.autoPays = this.data.autoPays.filter(a => a.id !== id);
+                this.saveData(); 
+                this.renderAll(); 
+                this.closeModals();
+                this.showToast('Auto Pay removed.');
+            });
+        },
+
+
+        openWorkspaceModal() { this.editingWorkspaceId = null; this.renderWorkspaces(); this.openModal('modal-workspace'); },
+
+        renderWorkspaces() {
+            let html = '';
+            this.workspaces.forEach(ws => {
+                const isActive  = ws.id === this.activeWorkspaceId;
+                const isEditing = ws.id === this.editingWorkspaceId;
+                if (isEditing) {
+                    html += `<div class="flex items-center justify-between p-3 rounded-xl border border-primary bg-indigo-50 dark:bg-indigo-900/30 transition-colors mb-2"><form onsubmit="app.saveWorkspaceNameInline(event,'${ws.id}')" class="flex gap-2 w-full"><input type="text" id="inline-rename-${ws.id}" value="${ws.name}" required class="flex-1 px-2 py-1 text-sm rounded-lg border border-slate-200 dark:border-darkBorder bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-800 dark:text-slate-100"><button type="button" onclick="app.cancelRenameInline()" class="text-slate-400 hover:text-slate-600 p-1"><i class="ph ph-x text-lg"></i></button><button type="submit" class="text-emerald-500 p-1"><i class="ph ph-check text-xl"></i></button></form></div>`;
+                } else {
+                    html += `<div class="flex items-center justify-between p-3 rounded-xl border ${isActive ? 'border-primary bg-indigo-50 dark:bg-indigo-900/30' : 'border-slate-200 dark:border-darkBorder hover:bg-slate-50 dark:hover:bg-slate-800/50'} transition-colors cursor-pointer mb-2" onclick="app.switchWorkspace('${ws.id}')"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isActive ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'} flex items-center justify-center"><i class="ph-fill ph-wallet"></i></div><span class="font-medium ${isActive ? 'text-primary' : ''}">${ws.name}</span></div><div class="flex items-center gap-1"><button onclick="event.stopPropagation();app.startRenameInline('${ws.id}')" class="text-slate-400 hover:text-blue-500 p-1 rounded transition-colors"><i class="ph ph-pencil-simple text-lg"></i></button>${!isActive && this.workspaces.length > 1 ? `<button onclick="event.stopPropagation();app.deleteWorkspace('${ws.id}')" class="text-slate-400 hover:text-red-500 p-1 rounded transition-colors"><i class="ph ph-trash text-lg"></i></button>` : isActive ? `<i class="ph ph-check-circle text-primary text-xl ml-1"></i>` : ''}</div></div>`;
+                }
+            });
+            document.getElementById('workspace-list').innerHTML = html;
+        },
+
+        switchWorkspace(id) { this.activeWorkspaceId = id; this.syncDataPointer(); this.saveData(); this.renderAll(); this.closeModals(); this.showToast('Account Switched!'); },
+        createWorkspace(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-ws-name');
+            const name  = input.value.trim();
+            if (!name) return;
+            const newWs = { id: 'ws_' + Date.now(), name, users: [{ id: 'u1', name: 'Me', color: '#4F46E5', salaryDate: null }], transactions: [], autoPays: [] };
+            this.workspaces.push(newWs);
+            this.activeWorkspaceId = newWs.id;
+            input.value = '';
+            this.syncDataPointer(); this.saveData(); this.renderAll(); this.closeModals();
+            this.showToast('New Account Created!');
+        },
+        deleteWorkspace(id) {
+            this.confirmAction('Delete Account?', 'This will permanently delete this account and all its transactions.', () => {
+                this.workspaces = this.workspaces.filter(w => w.id !== id);
+                if (this.activeWorkspaceId === id) { this.activeWorkspaceId = this.workspaces[0].id; this.syncDataPointer(); }
+                this.saveData(); this.renderAll(); this.closeModals(); this.showToast('Account Deleted.');
+            });
+        },
+        startRenameInline(id) {
+            this.editingWorkspaceId = id; this.renderWorkspaces();
+            setTimeout(() => { const input = document.getElementById(`inline-rename-${id}`); if (input) { input.focus(); input.select(); } }, 50);
+        },
+        cancelRenameInline() { this.editingWorkspaceId = null; this.renderWorkspaces(); },
+        saveWorkspaceNameInline(e, id) {
+            e.preventDefault(); e.stopPropagation();
+            const input = document.getElementById(`inline-rename-${id}`);
+            if (!input) return;
+            const newName = input.value.trim();
+            if (newName) { const ws = this.workspaces.find(w => w.id === id); if (ws) { ws.name = newName; this.saveData(); this.syncDataPointer(); this.renderAll(); this.showToast('Account renamed!'); } }
+            this.editingWorkspaceId = null; this.renderWorkspaces();
+        },
+
+        setupDraggableFab() {
+            const fab = document.getElementById('draggable-fab');
+            let startX, startY, initialLeft, initialTop, hasMoved = false;
+            const onDown = (e) => {
+                const touch = e.touches ? e.touches[0] : e;
+                startX = touch.clientX; startY = touch.clientY;
+                const rect = fab.getBoundingClientRect();
+                initialLeft = rect.left; initialTop = rect.top; hasMoved = false;
+                document.addEventListener('mousemove', onMove, { passive: false });
+                document.addEventListener('mouseup', onUp);
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend', onUp);
+            };
+            const onMove = (e) => {
+                const touch = e.touches ? e.touches[0] : e;
+                const dx = touch.clientX - startX, dy = touch.clientY - startY;
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    hasMoved = true; e.preventDefault();
+                    const bnh = window.innerWidth < 768 ? 80 : 0;
+                    const maxX = window.innerWidth - fab.offsetWidth, maxY = window.innerHeight - fab.offsetHeight - bnh;
+                    fab.style.left = `${Math.max(0, Math.min(initialLeft + dx, maxX))}px`;
+                    fab.style.top  = `${Math.max(0, Math.min(initialTop + dy, maxY))}px`;
+                    fab.style.transform = 'none'; fab.style.bottom = 'auto'; fab.style.right = 'auto';
+                }
+            };
+            const onUp = () => {
+                document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+                document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
+                if (hasMoved) setTimeout(() => { hasMoved = false; }, 50);
+            };
+            fab.addEventListener('mousedown', onDown);
+            fab.addEventListener('touchstart', onDown, { passive: false });
+            fab.addEventListener('click', (e) => { if (hasMoved) { e.preventDefault(); e.stopPropagation(); return; } this.openTransactionModal(); });
+            window.addEventListener('resize', () => {
+                if (fab.style.left) {
+                    const bnh = window.innerWidth < 768 ? 80 : 0;
+                    fab.style.left = `${Math.max(0, Math.min(parseFloat(fab.style.left), window.innerWidth - fab.offsetWidth))}px`;
+                    fab.style.top  = `${Math.max(0, Math.min(parseFloat(fab.style.top),  window.innerHeight - fab.offsetHeight - bnh))}px`;
+                }
+            });
+        },
+
+        saveData() {
+            localStorage.setItem('wallet_workspaces', JSON.stringify(this.workspaces));
+            localStorage.setItem('wallet_active_ws', this.activeWorkspaceId);
+            localStorage.setItem('wallet_settings', JSON.stringify(this.settings));
+        },
+
+        navigate(viewId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll(`.nav-item[data-target="${viewId}"]`).forEach(el => el.classList.add('active'));
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById('page-title').innerText = viewId.replace('_', ' ');
+            this.currentView = viewId;
+            const mf = document.getElementById('month-filter-container');
+            if (['dashboard','summary','savings'].includes(viewId)) mf.classList.remove('hidden'); else mf.classList.add('hidden');
+            if (viewId === 'dashboard') setTimeout(() => this.renderCharts(), 100);
+            if (viewId === 'settings') { this.updateGSheetsUI(); }
+        },
+
+        toggleTheme() {
+            this.settings.darkMode = !this.settings.darkMode;
+            document.documentElement.classList.toggle('dark');
+            this.updateThemeUI(); this.saveData();
+            if (this.currentView === 'dashboard') this.renderCharts();
+        },
+        updateThemeUI() {
+            const icon = document.getElementById('theme-icon'), text = document.getElementById('theme-text'), mobileIcon = document.getElementById('theme-icon-mobile');
+            if (this.settings.darkMode) { if(icon) icon.classList.replace('ph-moon','ph-sun'); if(mobileIcon) mobileIcon.classList.replace('ph-moon','ph-sun'); if(text) text.innerText='Light Mode'; }
+            else { if(icon) icon.classList.replace('ph-sun','ph-moon'); if(mobileIcon) mobileIcon.classList.replace('ph-sun','ph-moon'); if(text) text.innerText='Dark Mode'; }
+        },
+
+        showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            const icon = document.getElementById('toast-icon');
+            icon.className = type === 'success' ? 'ph ph-check-circle text-emerald-400 text-xl' : 'ph ph-warning-circle text-red-400 text-xl';
+            toast.className = `fixed top-4 right-4 ${type === 'success' ? 'bg-slate-800' : 'bg-red-900'} text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-50 flex items-center gap-2 translate-x-0 opacity-100`;
+            setTimeout(() => { toast.classList.add('translate-x-full','opacity-0'); toast.classList.remove('translate-x-0','opacity-100'); }, 3000);
+        },
+
+        changeMonth(delta) { this.currentDate.setMonth(this.currentDate.getMonth() + delta); this.renderAll(); },
+
+        getFilteredTransactions() {
+            const year = this.currentDate.getFullYear(), month = this.currentDate.getMonth();
+            const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
+            return this.data.transactions.filter(tx => new Date(tx.date) <= endOfMonth);
+        },
+        getMonthlyTransactions() {
+            const year = this.currentDate.getFullYear(), month = this.currentDate.getMonth();
+            return this.data.transactions.filter(tx => { const d = new Date(tx.date); return d.getFullYear() === year && d.getMonth() === month; });
+        },
+        getUserBalance(userId, allTx) {
+            let balance = 0;
+            allTx.forEach(tx => {
+                if (tx.userId === userId) {
+                    if (['income','borrowed','withdraw_savings','lent_returned'].includes(tx.type)) balance += Number(tx.amount);
+                    if (['expense','lent','savings','borrowed_returned'].includes(tx.type)) balance -= Number(tx.amount);
+                }
+            });
+            return balance;
+        },
+
+        renderAll() {
+            const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            document.getElementById('current-month-display').innerText = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+            
+            const userSelects = [document.getElementById('tx-filter-user'), document.getElementById('tx-user'), document.getElementById('ap-user')];
+            let filterHtml = '<option value="all">All Users</option>', selectHtml = '';
+            this.data.users.forEach(u => { const opt = `<option value="${u.id}">${u.name}</option>`; filterHtml += opt; selectHtml += opt; });
+            
+            if (userSelects[0]) { const currFilter = userSelects[0].value; userSelects[0].innerHTML = filterHtml; userSelects[0].value = currFilter || 'all'; }
+            if (userSelects[1]) userSelects[1].innerHTML = selectHtml;
+            if (userSelects[2]) userSelects[2].innerHTML = selectHtml;
+            
+            this.renderDashboard(); 
+            this.renderAutoPays();
+            this.renderLentTracker(); 
+            this.renderBorrowedTracker(); 
+            this.renderSummary(); 
+            this.renderSavings(); 
+            this.renderTransactions(); 
+            this.renderUsers();
+            if (this.currentView === 'dashboard') setTimeout(() => this.renderCharts(), 50);
+        },
+
+        renderLentTracker() {
+            // Sort active loans properly (newest first)
+            const lentTxs = this.data.transactions.filter(t => t.type === 'lent').sort((a,b) => new Date(b.date) - new Date(a.date));
+            const returnTxs = this.data.transactions.filter(t => t.type === 'lent_returned');
+
+            let activeHtml = '';
+            let settledHtml = '';
+            let totalPending = 0;
+
+            lentTxs.forEach(lent => {
+                const user = this.data.users.find(u => u.id === lent.userId) || { name: 'Unknown', color: '#94a3b8' };
+                // Calculate total amount returned for this specific loan
+                const returned = returnTxs.filter(t => t.linkedTxId === lent.id).reduce((sum, t) => sum + Number(t.amount), 0);
+                const pending = Math.max(0, Number(lent.amount) - returned); // Clamp to 0 just in case overpaid
+                const pct = Math.min(100, Math.round((returned / Number(lent.amount)) * 100));
+
+                if (pending > 0) totalPending += pending;
+
+                const cardHtml = `
+                    <div class="glass p-5 rounded-2xl bg-white dark:bg-darkCard shadow-sm border border-slate-200 dark:border-darkBorder relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-500">${this.fmtDate(lent.date)}</span>
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-slate-100 truncate max-w-[150px] sm:max-w-[200px]" title="${lent.category}">${lent.category || 'Unnamed Loan'}</h4>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <div class="w-3 h-3 rounded-full" style="background-color:${user.color}"></div>
+                                    <span class="text-slate-600 dark:text-slate-400">Lent by ${user.name}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Lent</p>
+                                <p class="font-bold text-orange-500 text-lg">₹${lent.amount}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs font-medium mb-1.5">
+                                <span class="text-emerald-600 dark:text-emerald-400">Returned: ₹${returned}</span>
+                                <span class="text-orange-600 dark:text-orange-400">Pending: ₹${pending}</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                        ${pending > 0
+                            ? `<button onclick="app.openSettleModal('${lent.id}', ${pending}, '${lent.userId}', 'lent')" class="mt-5 w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 py-2.5 rounded-xl font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors flex items-center justify-center gap-2"><i class="ph ph-hand-coins text-lg"></i> Record Repayment</button>`
+                            : `<div class="mt-5 w-full text-center text-emerald-600 dark:text-emerald-400 text-sm font-bold flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/10 py-2.5 rounded-xl"><i class="ph-fill ph-check-circle text-lg"></i> Fully Settled</div>`
+                        }
+                    </div>
+                `;
+
+                if (pending > 0) activeHtml += cardHtml;
+                else settledHtml += cardHtml;
+            });
+
+            document.getElementById('lent-total-pending').innerText = this.fmtCurrency(totalPending);
+            document.getElementById('lent-active-grid').innerHTML = activeHtml || `<div class="col-span-full p-8 text-center text-slate-500 dark:text-slate-400 glass rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">No active loans found. Create a "Lent" transaction to start tracking.</div>`;
+            document.getElementById('lent-settled-grid').innerHTML = settledHtml || `<div class="col-span-full p-4 text-center text-sm text-slate-400 border border-slate-200 dark:border-darkBorder rounded-xl border-dashed">No fully settled loans yet.</div>`;
+        },
+
+        renderBorrowedTracker() {
+            // Sort active borrowings properly (newest first)
+            const borrowedTxs = this.data.transactions.filter(t => t.type === 'borrowed').sort((a,b) => new Date(b.date) - new Date(a.date));
+            const returnTxs = this.data.transactions.filter(t => t.type === 'borrowed_returned');
+
+            let activeHtml = '';
+            let settledHtml = '';
+            let totalPending = 0;
+
+            borrowedTxs.forEach(borrowed => {
+                const user = this.data.users.find(u => u.id === borrowed.userId) || { name: 'Unknown', color: '#94a3b8' };
+                // Calculate total amount returned for this specific borrowing
+                const returned = returnTxs.filter(t => t.linkedTxId === borrowed.id).reduce((sum, t) => sum + Number(t.amount), 0);
+                const pending = Math.max(0, Number(borrowed.amount) - returned); // Clamp to 0 just in case overpaid
+                const pct = Math.min(100, Math.round((returned / Number(borrowed.amount)) * 100));
+
+                if (pending > 0) totalPending += pending;
+
+                const cardHtml = `
+                    <div class="glass p-5 rounded-2xl bg-white dark:bg-darkCard shadow-sm border border-slate-200 dark:border-darkBorder relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-500">${this.fmtDate(borrowed.date)}</span>
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-slate-100 truncate max-w-[150px] sm:max-w-[200px]" title="${borrowed.category}">${borrowed.category || 'Unnamed Debt'}</h4>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <div class="w-3 h-3 rounded-full" style="background-color:${user.color}"></div>
+                                    <span class="text-slate-600 dark:text-slate-400">Borrowed by ${user.name}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Borrowed</p>
+                                <p class="font-bold text-blue-500 text-lg">₹${borrowed.amount}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs font-medium mb-1.5">
+                                <span class="text-emerald-600 dark:text-emerald-400">Repaid: ₹${returned}</span>
+                                <span class="text-blue-600 dark:text-blue-400">Pending: ₹${pending}</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                        ${pending > 0
+                            ? `<button onclick="app.openSettleModal('${borrowed.id}', ${pending}, '${borrowed.userId}', 'borrowed')" class="mt-5 w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 py-2.5 rounded-xl font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors flex items-center justify-center gap-2"><i class="ph ph-hand-arrow-down text-lg"></i> Record Repayment</button>`
+                            : `<div class="mt-5 w-full text-center text-emerald-600 dark:text-emerald-400 text-sm font-bold flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/10 py-2.5 rounded-xl"><i class="ph-fill ph-check-circle text-lg"></i> Fully Settled</div>`
+                        }
+                    </div>
+                `;
+
+                if (pending > 0) activeHtml += cardHtml;
+                else settledHtml += cardHtml;
+            });
+
+            document.getElementById('borrowed-total-pending').innerText = this.fmtCurrency(totalPending);
+            document.getElementById('borrowed-active-grid').innerHTML = activeHtml || `<div class="col-span-full p-8 text-center text-slate-500 dark:text-slate-400 glass rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">No active debts found. Create a "Borrowed" transaction to start tracking.</div>`;
+            document.getElementById('borrowed-settled-grid').innerHTML = settledHtml || `<div class="col-span-full p-4 text-center text-sm text-slate-400 border border-slate-200 dark:border-darkBorder rounded-xl border-dashed">No fully repaid debts yet.</div>`;
+        },
+
+        openSettleModal(txId, pending, userId, type = 'lent') {
+            document.getElementById('settle-form').reset();
+            document.getElementById('settle-parent-id').value = txId;
+            document.getElementById('settle-user-id').value = userId;
+            document.getElementById('settle-type').value = type;
+            document.getElementById('settle-pending-display').innerText = this.fmtCurrency(pending);
+            
+            const isBorrowed = type === 'borrowed';
+            document.getElementById('settle-title').innerText = isBorrowed ? 'Repay Debt (Money you owe)' : 'Record Repayment (Money given to you)';
+            document.getElementById('settle-amount-label').innerText = isBorrowed ? 'Amount You Are Paying Back (₹)' : 'Amount They Returned Now (₹)';
+            document.getElementById('settle-submit-btn').className = isBorrowed ? 'w-2/3 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2' : 'w-2/3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2';
+
+            const amtInput = document.getElementById('settle-amount');
+            amtInput.max = pending; // Warns if overpaying visually
+            amtInput.value = pending; // Default to full amount
+            document.getElementById('settle-date').valueAsDate = new Date();
+            
+            // UI Color theme shifting based on type
+            const pendingBox = document.getElementById('settle-pending-box');
+            if(isBorrowed) {
+                pendingBox.className = 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 p-3 rounded-lg mb-4 text-sm border border-blue-200 dark:border-blue-800/50';
+            } else {
+                pendingBox.className = 'bg-orange-50 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300 p-3 rounded-lg mb-4 text-sm border border-orange-200 dark:border-orange-800/50';
+            }
+            
+            this.openModal('modal-settle');
+        },
+
+        saveSettlement(e) {
+            e.preventDefault();
+            const parentId = document.getElementById('settle-parent-id').value;
+            const userId = document.getElementById('settle-user-id').value;
+            const type = document.getElementById('settle-type').value;
+            const amount = Number(document.getElementById('settle-amount').value);
+            const date = document.getElementById('settle-date').value;
+
+            const parentTx = this.data.transactions.find(t => t.id === parentId);
+            if (!parentTx) return;
+
+            const newTxType = type === 'borrowed' ? 'borrowed_returned' : 'lent_returned';
+            const categoryPrefix = type === 'borrowed' ? 'Repaid: ' : 'Returned: ';
+
+            const tx = {
+                id: 'tx_' + Date.now(),
+                type: newTxType,
+                linkedTxId: parentId,
+                userId: userId,
+                amount: amount,
+                category: categoryPrefix + parentTx.category,
+                date: date,
+                note: 'Partial/Full settlement'
+            };
+
+            this.data.transactions.push(tx);
+            this.saveData();
+            this.closeModals();
+            this.renderAll();
+
+            if (this.settings.autoSync && this.settings.gsheetsUrl) {
+                this.syncToGoogleSheets(true);
+            }
+            this.showToast('Repayment recorded successfully!');
+        },
+
+        renderSummary() {
+            const monthTx = this.getMonthlyTransactions();
+            let totalIncome=0, totalExpense=0, totalLent=0, totalBorrowed=0, totalSavings=0;
+            const userStats = {};
+            this.data.users.forEach(u => { userStats[u.id] = { name: u.name, color: u.color, income:0, expense:0, lent:0, borrowed:0, savings:0 }; });
+            
+            monthTx.forEach(tx => {
+                const amount = Number(tx.amount);
+                if(tx.type==='income')           { totalIncome   += amount; if(userStats[tx.userId]) userStats[tx.userId].income   += amount; }
+                if(tx.type==='expense')          { totalExpense  += amount; if(userStats[tx.userId]) userStats[tx.userId].expense  += amount; }
+                if(tx.type==='lent')             { totalLent     += amount; if(userStats[tx.userId]) userStats[tx.userId].lent     += amount; }
+                if(tx.type==='lent_returned')    { totalLent     -= amount; if(userStats[tx.userId]) userStats[tx.userId].lent     -= amount; } // Deduct returned lent from Total Lent for Net logic
+                if(tx.type==='borrowed')         { totalBorrowed += amount; if(userStats[tx.userId]) userStats[tx.userId].borrowed += amount; }
+                if(tx.type==='borrowed_returned'){ totalBorrowed -= amount; if(userStats[tx.userId]) userStats[tx.userId].borrowed -= amount; } // Deduct repaid from total borrowed
+                if(tx.type==='savings')          { totalSavings  += amount; if(userStats[tx.userId]) userStats[tx.userId].savings  += amount; }
+                if(tx.type==='withdraw_savings') { totalSavings  -= amount; if(userStats[tx.userId]) userStats[tx.userId].savings  -= amount; }
+            });
+
+            document.getElementById('summary-overall-cards').innerHTML = `
+                <div class="glass p-5 rounded-xl border-l-4 border-emerald-500 bg-white dark:bg-darkCard"><div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-2"><i class="ph ph-trend-up text-xl"></i><span class="font-medium">Total Income</span></div><p class="text-2xl font-bold">${this.fmtCurrency(totalIncome)}</p></div>
+                <div class="glass p-5 rounded-xl border-l-4 border-red-500 bg-white dark:bg-darkCard"><div class="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2"><i class="ph ph-trend-down text-xl"></i><span class="font-medium">Total Expense</span></div><p class="text-2xl font-bold">${this.fmtCurrency(totalExpense)}</p></div>
+                <div class="glass p-5 rounded-xl border-l-4 border-orange-500 bg-white dark:bg-darkCard"><div class="flex items-center gap-2 text-orange-600 dark:text-orange-400 mb-2"><i class="ph ph-export text-xl"></i><span class="font-medium">Net Lent</span></div><p class="text-2xl font-bold">${this.fmtCurrency(totalLent)}</p></div>
+                <div class="glass p-5 rounded-xl border-l-4 border-blue-500 bg-white dark:bg-darkCard"><div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2"><i class="ph ph-import text-xl"></i><span class="font-medium">Net Borrowed</span></div><p class="text-2xl font-bold">${this.fmtCurrency(totalBorrowed)}</p></div>
+                <div class="glass p-5 rounded-xl border-l-4 border-purple-500 bg-white dark:bg-darkCard"><div class="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2"><i class="ph ph-piggy-bank text-xl"></i><span class="font-medium">Net Saved</span></div><p class="text-2xl font-bold">${this.fmtCurrency(totalSavings)}</p></div>
+            `;
+            let usersHtml = '';
+            Object.values(userStats).forEach(u => {
+                const netMonthlyFlow = (u.income + u.borrowed) - (u.expense + u.lent + u.savings);
+                const flowColor = netMonthlyFlow >= 0 ? 'text-emerald-500' : 'text-red-500';
+                usersHtml += `<div class="glass p-5 rounded-2xl bg-white dark:bg-darkCard shadow-sm border border-slate-200 dark:border-darkBorder"><div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100 dark:border-darkBorder"><div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm" style="background-color:${u.color}">${u.name.charAt(0)}</div><div><h4 class="font-bold text-lg leading-tight">${u.name}</h4><p class="text-xs text-slate-500">Net Flow: <span class="font-semibold ${flowColor}">${this.fmtCurrency(netMonthlyFlow)}</span></p></div></div><div class="space-y-3 text-sm"><div class="flex justify-between items-center"><span class="text-slate-500 flex items-center gap-1"><i class="ph ph-trend-up text-emerald-500"></i> Income</span><span class="font-medium">${this.fmtCurrency(u.income)}</span></div><div class="flex justify-between items-center"><span class="text-slate-500 flex items-center gap-1"><i class="ph ph-trend-down text-red-500"></i> Expense</span><span class="font-medium">${this.fmtCurrency(u.expense)}</span></div><div class="flex justify-between items-center"><span class="text-slate-500 flex items-center gap-1"><i class="ph ph-export text-orange-500"></i> Net Lent</span><span class="font-medium">${this.fmtCurrency(u.lent)}</span></div><div class="flex justify-between items-center"><span class="text-slate-500 flex items-center gap-1"><i class="ph ph-import text-blue-500"></i> Net Borrowed</span><span class="font-medium">${this.fmtCurrency(u.borrowed)}</span></div><div class="flex justify-between items-center border-t border-slate-100 dark:border-darkBorder pt-2 mt-2"><span class="text-slate-500 flex items-center gap-1 font-medium"><i class="ph ph-piggy-bank text-purple-500"></i> Net Saved</span><span class="font-bold text-purple-600 dark:text-purple-400">${this.fmtCurrency(u.savings)}</span></div></div></div>`;
+            });
+            document.getElementById('summary-users-grid').innerHTML = usersHtml || `<div class="col-span-full text-center text-slate-500 py-8">No users found.</div>`;
+        },
+
+        renderSavings() {
+            const allTx = this.data.transactions, monthTx = this.getMonthlyTransactions();
+            let totalSavedAllTime = 0, totalSavedMonth = 0;
+            const userSavings = {};
+            this.data.users.forEach(u => { userSavings[u.id] = { name: u.name, color: u.color, allTime: 0, month: 0 }; });
+            allTx.forEach(tx => {
+                if(tx.type==='savings')          { totalSavedAllTime += Number(tx.amount); if(userSavings[tx.userId]) userSavings[tx.userId].allTime += Number(tx.amount); }
+                if(tx.type==='withdraw_savings') { totalSavedAllTime -= Number(tx.amount); if(userSavings[tx.userId]) userSavings[tx.userId].allTime -= Number(tx.amount); }
+            });
+            monthTx.forEach(tx => {
+                if(tx.type==='savings')          { totalSavedMonth += Number(tx.amount); if(userSavings[tx.userId]) userSavings[tx.userId].month += Number(tx.amount); }
+                if(tx.type==='withdraw_savings') { totalSavedMonth -= Number(tx.amount); if(userSavings[tx.userId]) userSavings[tx.userId].month -= Number(tx.amount); }
+            });
+            const allTimeEl = document.getElementById('save-total-all');
+            const monthEl   = document.getElementById('save-total-month');
+            if(allTimeEl) allTimeEl.innerText = this.fmtCurrency(totalSavedAllTime);
+            if(monthEl)   monthEl.innerText   = this.fmtCurrency(totalSavedMonth);
+            let usersHtml = '';
+            Object.values(userSavings).forEach(u => {
+                usersHtml += `<div class="glass p-5 rounded-2xl bg-white dark:bg-darkCard shadow-sm border border-slate-200 dark:border-darkBorder hover:-translate-y-1 transition-transform"><div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-100 dark:border-darkBorder"><div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" style="background-color:${u.color}">${u.name.charAt(0)}</div><h4 class="font-bold text-lg">${u.name}</h4></div><div class="flex justify-between items-center mb-1"><span class="text-sm text-slate-500">All Time</span><span class="font-bold text-purple-600 dark:text-purple-400 text-lg">${this.fmtCurrency(u.allTime)}</span></div><div class="flex justify-between items-center"><span class="text-sm text-slate-500">This Month</span><span class="font-medium">${this.fmtCurrency(u.month)}</span></div></div>`;
+            });
+            const gridEl = document.getElementById('save-users-grid');
+            if(gridEl) gridEl.innerHTML = usersHtml || `<div class="col-span-full text-center text-slate-500 py-4">No users found.</div>`;
+        },
+
+        renderDashboard() {
+            const allTx = this.getFilteredTransactions(), monthTx = this.getMonthlyTransactions();
+            let totalBankBal = 0, monthIncome = 0, monthExpense = 0;
+            monthTx.forEach(tx => { if(tx.type==='income') monthIncome += Number(tx.amount); if(tx.type==='expense') monthExpense += Number(tx.amount); });
+            let userCardsHtml = '', alertsHtml = '';
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            this.data.users.forEach(u => {
+                const bal = this.getUserBalance(u.id, allTx);
+                totalBankBal += bal;
+                if (bal < 0) alertsHtml += `<div class="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-3 rounded-lg flex items-center text-sm border border-red-200 dark:border-red-800/50"><i class="ph-fill ph-warning-circle text-lg mr-2"></i><span><strong>${u.name}'s</strong> balance is negative (${this.fmtCurrency(bal)}).</span></div>`;
+                if (u.salaryDate) {
+                    const testDate = new Date(today.getFullYear(), today.getMonth(), u.salaryDate);
+                    const diffDays = Math.ceil((testDate - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0 && diffDays <= 3) alertsHtml += `<div class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 p-3 rounded-lg flex items-center text-sm border border-blue-200 dark:border-blue-800/50"><i class="ph-fill ph-calendar-check text-lg mr-2"></i><span>Salary expected for <strong>${u.name}</strong> in ${diffDays === 0 ? 'today!' : diffDays + ' day(s)'}.</span></div>`;
+                }
+                userCardsHtml += `<div class="glass min-w-[240px] p-5 rounded-2xl relative overflow-hidden bg-white dark:bg-darkCard shadow-sm border-t-4" style="border-top-color:${u.color}"><div class="flex justify-between items-start mb-2"><span class="font-medium text-slate-600 dark:text-slate-300">${u.name}</span><div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background-color:${u.color}">${u.name.charAt(0)}</div></div><h4 class="text-2xl font-bold ${bal < 0 ? 'text-red-500' : ''}">${this.fmtCurrency(bal)}</h4><p class="text-xs text-slate-500 mt-2">Wallet Share</p></div>`;
+            });
+
+            // Smart Alert for upcoming Auto Pays
+            if (this.data.autoPays) {
+                this.data.autoPays.forEach(ap => {
+                    if (!ap.active) return;
+                    const parts = ap.nextDate.split('-');
+                    let nextD = new Date(parts[0], parts[1] - 1, parts[2]);
+                    nextD.setHours(0,0,0,0);
+                    const diffDays = Math.ceil((nextD - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0 && diffDays <= 3) {
+                        alertsHtml += `<div class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 p-3 rounded-lg flex items-center text-sm border border-indigo-200 dark:border-indigo-800/50"><i class="ph-fill ph-arrows-clockwise text-lg mr-2"></i><span>Auto Pay for <strong>${ap.title}</strong> is scheduled in ${diffDays === 0 ? 'today!' : diffDays + ' day(s)'}.</span></div>`;
+                    }
+                });
+            }
+
+            if (!this.data.users.length) userCardsHtml = `<div class="p-4 text-slate-400 text-sm">No users added yet.</div>`;
+            document.getElementById('smart-alerts').innerHTML = alertsHtml;
+            document.getElementById('dash-total-balance').innerText  = this.fmtCurrency(totalBankBal);
+            document.getElementById('dash-total-income').innerText   = this.fmtCurrency(monthIncome);
+            document.getElementById('dash-total-expense').innerText  = this.fmtCurrency(monthExpense);
+            document.getElementById('dash-user-balances').innerHTML  = userCardsHtml;
+            const recent = [...this.data.transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            let recentHtml = '';
+            if (!recent.length) recentHtml = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No transactions yet</td></tr>`;
+            recent.forEach(tx => {
+                const user = this.data.users.find(u => u.id === tx.userId) || { name: '?', color: '#ccc' };
+                const isPositive = ['income','borrowed','withdraw_savings','lent_returned'].includes(tx.type);
+                recentHtml += `<tr class="border-b border-slate-100 dark:border-darkBorder last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"><td class="py-3 pr-2 whitespace-nowrap">${this.fmtDate(tx.date)}</td><td class="py-3 px-2"><span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:${user.color}">${user.name}</span></td><td class="py-3 px-2"><p class="font-medium truncate max-w-[150px]">${tx.category}</p><p class="text-xs text-slate-400 capitalize">${tx.type.replace('_', ' ')}</p></td><td class="py-3 pl-2 text-right font-semibold ${isPositive ? 'text-emerald-500' : 'text-red-500'}">${isPositive ? '+' : '-'}${this.fmtCurrency(tx.amount)}</td></tr>`;
+            });
+            document.getElementById('dash-recent-tx').innerHTML = recentHtml;
+        },
+
+        renderCharts() {
+            if (!document.getElementById('barChart') || this.currentView !== 'dashboard') return;
+            const isDark = this.settings.darkMode;
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            const monthTx = this.getMonthlyTransactions();
+            const userLabels   = this.data.users.map(u => u.name);
+            const userIncomes  = this.data.users.map(u => monthTx.filter(tx => tx.userId === u.id && tx.type === 'income').reduce((s,t) => s + Number(t.amount), 0));
+            const userExpenses = this.data.users.map(u => monthTx.filter(tx => tx.userId === u.id && tx.type === 'expense').reduce((s,t) => s + Number(t.amount), 0));
+            if (this.charts.bar) this.charts.bar.destroy();
+            this.charts.bar = new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: { labels: userLabels, datasets: [{ label:'Income', data:userIncomes, backgroundColor:'#10b981', borderRadius:4 }, { label:'Expense', data:userExpenses, backgroundColor:'#ef4444', borderRadius:4 }] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:textColor } } }, scales:{ y:{ grid:{ color:gridColor }, ticks:{ color:textColor } }, x:{ grid:{ display:false }, ticks:{ color:textColor } } } }
+            });
+            const allTx = this.getFilteredTransactions();
+            let validBalances = [], validColors = [], validLabels = [];
+            this.data.users.forEach(u => { const bal = this.getUserBalance(u.id, allTx); if(bal > 0) { validBalances.push(bal); validColors.push(u.color); validLabels.push(u.name); } });
+            if (this.charts.doughnut) this.charts.doughnut.destroy();
+            if (!validBalances.length) { validBalances=[1]; validColors=[gridColor]; validLabels=['No Balances']; }
+            this.charts.doughnut = new Chart(document.getElementById('doughnutChart'), {
+                type: 'doughnut',
+                data: { labels:validLabels, datasets:[{ data:validBalances, backgroundColor:validColors, borderWidth:0, hoverOffset:4 }] },
+                options: { responsive:true, maintainAspectRatio:false, cutout:'70%', plugins:{ legend:{ position:'bottom', labels:{ color:textColor, padding:20, usePointStyle:true } } } }
+            });
+        },
+
+        renderTransactions() {
+            const search     = document.getElementById('tx-search').value.toLowerCase();
+            const userFilter = document.getElementById('tx-filter-user').value;
+            const typeFilter = document.getElementById('tx-filter-type').value;
+            let filtered = [...this.data.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(search)
+            filtered = filtered.filter(tx => (tx.category&&tx.category.toLowerCase().includes(search)) || (tx.note&&tx.note.toLowerCase().includes(search)));
+            if(userFilter!=='all') filtered = filtered.filter(tx => tx.userId === userFilter);
+            if(typeFilter!=='all') filtered = filtered.filter(tx => tx.type === typeFilter);
+            const tbody = document.getElementById('tx-list-full'), emptyState = document.getElementById('tx-empty-state');
+            if (!filtered.length) { tbody.innerHTML=''; emptyState.classList.remove('hidden'); emptyState.classList.add('flex'); return; }
+            emptyState.classList.add('hidden'); emptyState.classList.remove('flex');
+            let html = '';
+            filtered.forEach(tx => {
+                const user = this.data.users.find(u => u.id === tx.userId) || { name:'Deleted User', color:'#94a3b8' };
+                const isPositive = ['income','borrowed','withdraw_savings','lent_returned'].includes(tx.type);
+                const isSavings  = ['savings','withdraw_savings'].includes(tx.type);
+                let amountClass  = isPositive ? 'text-emerald-500' : 'text-red-500';
+                if(isSavings) amountClass = 'text-purple-500';
+                let icon = 'ph-arrows-left-right';
+                if(tx.type==='income')           icon = 'ph-trend-up text-emerald-500';
+                if(tx.type==='expense')          icon = 'ph-trend-down text-red-500';
+                if(tx.type==='lent')             icon = 'ph-export text-orange-500';
+                if(tx.type==='lent_returned')    icon = 'ph-hand-coins text-emerald-500';
+                if(tx.type==='borrowed')         icon = 'ph-import text-blue-500';
+                if(tx.type==='borrowed_returned')icon = 'ph-hand-arrow-up text-red-500';
+                if(tx.type==='savings')          icon = 'ph-piggy-bank text-purple-500';
+                if(tx.type==='withdraw_savings') icon = 'ph-hand-coins text-purple-500';
+                
+                let displayType = tx.type;
+                if(tx.type === 'withdraw_savings') displayType = 'withdrawn from savings';
+                if(tx.type === 'lent_returned') displayType = 'lent returned';
+                if(tx.type === 'borrowed_returned') displayType = 'borrowed repaid';
+
+                html += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group"><td class="p-4 whitespace-nowrap">${this.fmtDate(tx.date)}</td><td class="p-4"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color:${user.color}">${user.name.charAt(0)}</div><span>${user.name}</span></div></td><td class="p-4 capitalize flex items-center gap-2"><i class="ph ${icon} text-lg"></i> ${displayType}</td><td class="p-4"><p class="font-medium">${tx.category}</p>${tx.note ? `<p class="text-xs text-slate-500">${tx.note}</p>` : ''}</td><td class="p-4 text-right font-bold ${amountClass}">${isPositive ? '+' : '-'}${this.fmtCurrency(tx.amount)}</td><td class="p-4 text-center"><div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2"><button onclick="app.openTransactionModal('${tx.id}')" class="text-blue-500 hover:text-blue-700 p-1"><i class="ph ph-pencil-simple text-lg"></i></button><button onclick="app.deleteTransaction('${tx.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="ph ph-trash text-lg"></i></button></div></td></tr>`;
+            });
+            tbody.innerHTML = html;
+        },
+
+        renderUsers() {
+            const grid = document.getElementById('users-grid');
+            let html = '';
+            this.data.users.forEach(u => {
+                const bal = this.getUserBalance(u.id, this.data.transactions);
+                html += `<div class="glass p-5 rounded-2xl bg-white dark:bg-darkCard shadow-sm border border-slate-200 dark:border-darkBorder relative overflow-hidden group"><div class="absolute top-0 left-0 w-full h-2" style="background-color:${u.color}"></div><div class="flex justify-between items-start mt-2"><div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md" style="background-color:${u.color}">${u.name.charAt(0)}</div><div><h4 class="font-bold text-lg">${u.name}</h4><p class="text-xs text-slate-500 dark:text-slate-400">Salary Day: ${u.salaryDate||'Not set'}</p></div></div><div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onclick="app.openUserModal('${u.id}')" class="text-slate-400 hover:text-blue-500 p-1"><i class="ph ph-pencil-simple text-lg"></i></button><button onclick="app.deleteUser('${u.id}')" class="text-slate-400 hover:text-red-500 p-1"><i class="ph ph-trash text-lg"></i></button></div></div><div class="mt-4 pt-4 border-t border-slate-100 dark:border-darkBorder"><p class="text-sm text-slate-500 mb-1">Current Balance</p><p class="text-xl font-bold ${bal < 0 ? 'text-red-500' : ''}">${this.fmtCurrency(bal)}</p></div></div>`;
+            });
+            grid.innerHTML = html;
+        },
+
+        calculateSplit() {
+            const target = Number(document.getElementById('split-target').value);
+            if (!target || target <= 0) { this.showToast('Please enter a valid target amount.', 'error'); return; }
+            const allTx = this.data.transactions;
+            let totalPool = 0;
+            const userStats = [];
+            this.data.users.forEach(u => { const bal = this.getUserBalance(u.id, allTx); if(bal > 0) { totalPool += bal; userStats.push({ name:u.name, color:u.color, balance:bal }); } });
+            if (target > totalPool) { this.showToast(`Target exceeds total positive balance (${this.fmtCurrency(totalPool)})`, 'error'); return; }
+            if (!userStats.length) { this.showToast('No users have a positive balance.', 'error'); return; }
+            let html = `<div class="p-5 border-b border-slate-100 dark:border-darkBorder bg-slate-50 dark:bg-slate-800/50 flex flex-col sm:flex-row justify-between gap-4 sm:items-center"><div><h3 class="font-semibold text-lg">Results</h3><p class="text-sm text-slate-500 mt-1">Fair proportional split.</p></div><div class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 px-4 py-2 rounded-lg text-right"><p class="text-xs uppercase font-bold tracking-wider opacity-80 mb-0.5">Target</p><p class="text-xl font-bold">${this.fmtCurrency(target)}</p></div></div><div class="overflow-x-auto p-1"><table class="w-full text-left border-collapse whitespace-nowrap"><thead><tr class="text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-darkBorder"><th class="p-4 font-medium">Person</th><th class="p-4 font-medium text-right">Current Bal</th><th class="p-4 font-medium text-right">Share %</th><th class="p-4 font-medium text-right text-primary">Send Amount</th><th class="p-4 font-medium text-right">Remaining</th></tr></thead><tbody class="text-sm divide-y divide-slate-100 dark:divide-darkBorder">`;
+            let totalSent = 0;
+            userStats.forEach(u => {
+                const shareRatio = u.balance / totalPool, pct = (shareRatio * 100).toFixed(2), contribution = target * shareRatio, remaining = u.balance - contribution;
+                totalSent += contribution;
+                html += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"><td class="p-4 font-medium flex items-center gap-2"><div class="w-3 h-3 rounded-full" style="background-color:${u.color}"></div>${u.name}</td><td class="p-4 text-right">${this.fmtCurrency(u.balance)}</td><td class="p-4 text-right text-slate-400">${pct}%</td><td class="p-4 text-right font-bold text-primary text-base">${this.fmtCurrency(contribution)}</td><td class="p-4 text-right font-medium">${this.fmtCurrency(remaining)}</td></tr>`;
+            });
+            html += `</tbody><tfoot class="bg-slate-50 dark:bg-slate-800/50 font-bold border-t border-slate-200 dark:border-darkBorder"><tr><td class="p-4">Total</td><td class="p-4 text-right">${this.fmtCurrency(totalPool)}</td><td class="p-4 text-right text-slate-500">100%</td><td class="p-4 text-right text-primary text-lg">${this.fmtCurrency(totalSent)}</td><td class="p-4 text-right">${this.fmtCurrency(totalPool - totalSent)}</td></tr></tfoot></table></div>`;
+            const container = document.getElementById('split-results-container');
+            container.innerHTML = html; container.classList.remove('hidden');
+        },
+
+        openModal(id) {
+            const overlay = document.getElementById('modal-overlay'), modal = document.getElementById(id);
+            overlay.classList.remove('hidden'); modal.classList.remove('hidden');
+            void overlay.offsetWidth;
+            overlay.classList.remove('opacity-0'); modal.classList.remove('opacity-0','scale-95');
+        },
+        closeModals() {
+            this.editingWorkspaceId = null;
+            const overlay = document.getElementById('modal-overlay');
+            const modals  = ['modal-tour','modal-workspace','modal-transaction','modal-user','modal-confirm', 'modal-settle', 'modal-autopay'].map(id => document.getElementById(id));
+            overlay.classList.add('opacity-0');
+            modals.forEach(m => m.classList.add('opacity-0','scale-95'));
+            setTimeout(() => { overlay.classList.add('hidden'); modals.forEach(m => m.classList.add('hidden')); }, 300);
+            this.pendingAction = null;
+        },
+        confirmAction(title, msg, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-msg').innerText   = msg;
+            this.pendingAction = callback;
+            this.openModal('modal-confirm');
+        },
+        executeConfirm() { if(this.pendingAction) { this.pendingAction(); this.pendingAction = null; } },
+
+        handleTxTypeChange() {
+            const type = document.getElementById('tx-type').value;
+            const catLabel = document.getElementById('tx-cat-label'), catInput = document.getElementById('tx-category');
+            const submitBtn = document.getElementById('tx-submit-btn');
+            const labelMap = { lent:'Lent To', lent_returned:'Returned By', borrowed:'Borrowed From', borrowed_returned:'Repaid To', income:'Income Source', savings:'Savings Account / Goal', withdraw_savings:'Withdrawn From' };
+            const phMap    = { lent:'e.g. John', lent_returned:'e.g. John', borrowed:'e.g. Bank, Alice', borrowed_returned: 'e.g. Bank, Alice', income:'e.g. Salary, Freelance', savings:'e.g. FD, Mutual Fund', withdraw_savings:'e.g. Emergency Fund' };
+            catLabel.innerText  = labelMap[type] || 'Category';
+            catInput.placeholder = phMap[type]   || 'e.g. Food, Rent';
+            submitBtn.innerHTML = ['expense','lent','borrowed_returned','savings'].includes(type) ? '<i class="ph ph-qr-code text-xl"></i> Save & Pay (UPI)' : 'Save Transaction';
+        },
+        openUPI() { window.location.href = 'upi://pay'; },
+
+        openTransactionModal(txId = null) {
+            if (!this.data.users.length) { this.showToast('Please add a user first!', 'error'); this.navigate('users'); return; }
+            document.getElementById('tx-form').reset();
+            document.getElementById('tx-date').valueAsDate = new Date();
+            this.handleTxTypeChange();
+            if (txId) {
+                const tx = this.data.transactions.find(t => t.id === txId);
+                if (tx) {
+                    document.getElementById('tx-modal-title').innerText = 'Edit Transaction';
+                    document.getElementById('tx-id').value       = tx.id;
+                    document.getElementById('tx-type').value     = tx.type;
+                    this.handleTxTypeChange();
+                    document.getElementById('tx-user').value     = tx.userId;
+                    document.getElementById('tx-amount').value   = tx.amount;
+                    document.getElementById('tx-category').value = tx.category;
+                    document.getElementById('tx-date').value     = tx.date;
+                    document.getElementById('tx-note').value     = tx.note || '';
+                }
+            } else {
+                document.getElementById('tx-modal-title').innerText = 'New Transaction';
+                document.getElementById('tx-id').value = '';
+            }
+            this.openModal('modal-transaction');
+        },
+
+        saveTransaction(e) {
+            e.preventDefault();
+            const id = document.getElementById('tx-id').value;
+            const txType = document.getElementById('tx-type').value;
+            const tx = {
+                id: id || 'tx_' + Date.now(),
+                type: txType,
+                userId:   document.getElementById('tx-user').value,
+                amount:   Number(document.getElementById('tx-amount').value),
+                category: document.getElementById('tx-category').value,
+                date:     document.getElementById('tx-date').value,
+                note:     document.getElementById('tx-note').value
+            };
+            if (id) { const idx = this.data.transactions.findIndex(t => t.id === id); if(idx !== -1) this.data.transactions[idx] = tx; }
+            else this.data.transactions.push(tx);
+            this.saveData();
+            this.closeModals();
+            this.renderAll();
+
+            if (this.settings.autoSync && this.settings.gsheetsUrl) {
+                this.syncToGoogleSheets(true); 
+            }
+
+            if (['expense','lent','borrowed_returned','savings'].includes(txType)) {
+                this.showToast('Saved! Opening UPI Apps...');
+                setTimeout(() => this.openUPI(), 500);
+            } else {
+                this.showToast('Transaction saved!');
+            }
+        },
+
+        deleteTransaction(id) {
+            this.confirmAction('Delete Transaction?', 'Are you sure?', () => {
+                this.data.transactions = this.data.transactions.filter(t => t.id !== id);
+                this.saveData(); this.renderAll(); this.closeModals();
+                this.showToast('Deleted.');
+            });
+        },
+
+        openUserModal(userId = null) {
+            document.getElementById('user-form').reset();
+            if (userId) {
+                const u = this.data.users.find(u => u.id === userId);
+                if (u) {
+                    document.getElementById('user-modal-title').innerText = 'Edit User';
+                    document.getElementById('user-id').value     = u.id;
+                    document.getElementById('user-name').value   = u.name;
+                    document.getElementById('user-color').value  = u.color;
+                    document.getElementById('user-salary').value = u.salaryDate || '';
+                }
+            } else {
+                document.getElementById('user-modal-title').innerText = 'Add User';
+                document.getElementById('user-id').value = '';
+                const colors = ['#4F46E5','#ec4899','#10b981','#f59e0b','#8b5cf6','#06b6d4'];
+                document.getElementById('user-color').value = colors[Math.floor(Math.random() * colors.length)];
+            }
+            this.openModal('modal-user');
+        },
+        saveUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('user-id').value;
+            const u  = { id: id || 'u_' + Date.now(), name: document.getElementById('user-name').value, color: document.getElementById('user-color').value, salaryDate: document.getElementById('user-salary').value || null };
+            if (id) { const idx = this.data.users.findIndex(x => x.id === id); if(idx !== -1) this.data.users[idx] = u; }
+            else this.data.users.push(u);
+            this.saveData(); this.closeModals(); this.renderAll();
+            this.showToast('User saved!');
+        },
+        deleteUser(id) {
+            if (this.data.transactions.some(t => t.userId === id)) { this.showToast('Cannot delete user with transactions.', 'error'); return; }
+            this.confirmAction('Remove User?', 'Are you sure?', () => {
+                this.data.users = this.data.users.filter(u => u.id !== id);
+                this.saveData(); this.renderAll(); this.closeModals();
+                this.showToast('User removed.');
+            });
+        },
+
+        exportJSON() {
+            const backup = { workspaces: this.workspaces, settings: this.settings };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href = url; a.download = `wallet_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            this.showToast('Backup downloaded');
+        },
+        importJSON(event) {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.workspaces) {
+                        this.workspaces = importedData.workspaces;
+                        this.activeWorkspaceId = this.workspaces[0].id;
+                        this.settings = Object.assign({ darkMode:false, gsheetsUrl:'', autoSync:false }, importedData.settings || {});
+                        this.syncDataPointer(); this.saveData(); this.renderAll();
+                        document.documentElement.classList.toggle('dark', this.settings.darkMode);
+                        this.updateThemeUI(); this.updateGSheetsUI();
+                        this.showToast('Data imported!');
+                    } else if (importedData.users && importedData.transactions) {
+                        const defaultWs = { id:'ws_'+Date.now(), name:'Imported Account', users:importedData.users, transactions:importedData.transactions, autoPays: [] };
+                        this.workspaces.push(defaultWs); this.activeWorkspaceId = defaultWs.id;
+                        this.syncDataPointer(); this.saveData(); this.renderAll();
+                        this.showToast('Legacy Data imported!');
+                    } else { throw new Error("Invalid format"); }
+                } catch(err) { this.showToast('Invalid JSON file.', 'error'); }
+            };
+            reader.readAsText(file); event.target.value = '';
+        },
+        resetData() {
+            this.confirmAction('Erase All Data?', 'Permanently delete ALL data?', () => {
+                localStorage.clear();
+                this.workspaces = [{ id:'ws_'+Date.now(), name:'Main Account', users:[], transactions:[], autoPays:[] }];
+                this.activeWorkspaceId = this.workspaces[0].id;
+                this.settings = { darkMode: false, gsheetsUrl: '', autoSync: false };
+                this.syncDataPointer(); this.renderAll(); this.closeModals(); this.updateGSheetsUI();
+                this.showToast('Data erased.', 'error');
+            });
+        },
+        exportPDF() {
+            this.showToast('Preparing Print View...');
+
+            const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            const monthName = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+            const monthTx = this.getMonthlyTransactions().sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            let txRows = monthTx.length ? monthTx.map(tx => {
+                const user = this.data.users.find(u => u.id === tx.userId) || { name:'?' };
+                const isPos = ['income','borrowed','withdraw_savings','lent_returned'].includes(tx.type);
+                const dType = tx.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 12px 10px; font-size: 13px; color: #1e293b;">${this.fmtDate(tx.date)}</td>
+                        <td style="padding: 12px 10px; font-size: 13px; color: #1e293b;">${user.name}</td>
+                        <td style="padding: 12px 10px; font-size: 13px; color: #1e293b;">${dType}</td>
+                        <td style="padding: 12px 10px; font-size: 13px; color: #1e293b;">
+                            <strong>${tx.category}</strong>
+                            ${tx.note ? `<br><span style="color:#64748b; font-size:11px;">${tx.note}</span>` : ''}
+                        </td>
+                        <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: ${isPos ? '#16a34a' : '#dc2626'};">
+                            ${isPos ? '+' : '-'}${this.fmtCurrency(tx.amount)}
+                        </td>
+                    </tr>
+                `;
+            }).join('') : `<tr><td colspan="5" style="padding: 20px; text-align: center; color: #64748b;">No transactions found for ${monthName}.</td></tr>`;
+
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Transactions - ${monthName}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #000; background: #fff; }
+                        h2 { border-bottom: 2px solid #4F46E5; padding-bottom: 10px; margin-bottom: 20px; color: #1e293b; font-size: 24px; }
+                        table { width: 100%; border-collapse: collapse; text-align: left; }
+                        th { background-color: #f8fafc; padding: 12px 10px; border-bottom: 2px solid #cbd5e1; font-size: 13px; color: #475569; }
+                        td { vertical-align: top; }
+                        @media print {
+                            @page { margin: 0.5in; }
+                            body { padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>${this.data.name} &bull; Transactions (${monthName})</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">Date</th>
+                                <th style="width: 15%">User</th>
+                                <th style="width: 20%">Type</th>
+                                <th style="width: 30%">Details</th>
+                                <th style="width: 20%; text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${txRows}
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
+                        Generated from Shared Wallet on ${new Date().toLocaleString()}
+                    </div>
+                </body>
+                </html>
+            `;
+
+            let printIframe = document.getElementById('wallet-print-iframe');
+            if (!printIframe) {
+                printIframe = document.createElement('iframe');
+                printIframe.id = 'wallet-print-iframe';
+                printIframe.style.position = 'absolute';
+                printIframe.style.width = '0px';
+                printIframe.style.height = '0px';
+                printIframe.style.border = 'none';
+                document.body.appendChild(printIframe);
+            }
+            
+            const doc = printIframe.contentWindow.document;
+            doc.open();
+            doc.write(printHtml);
+            doc.close();
+
+            setTimeout(() => {
+                printIframe.contentWindow.focus();
+                printIframe.contentWindow.print();
+            }, 300);
+        },
+        exportExcel() {
+            if (!window.XLSX) { this.showToast('Excel library loading, please retry.', 'error'); return; }
+            try {
+                const wb = XLSX.utils.book_new();
+                const txData = this.data.transactions.map(tx => {
+                    const user = this.data.users.find(u => u.id === tx.userId);
+                    let dt = tx.type; if(dt==='withdraw_savings') dt='Withdrawn From Savings'; else if(dt==='lent_returned') dt='Lent Returned'; else if(dt==='borrowed_returned') dt='Borrowed Repaid'; else dt=dt.charAt(0).toUpperCase()+dt.slice(1);
+                    return { Date:this.fmtDate(tx.date), User:user?user.name:'Unknown', Type:dt, Category:tx.category, Amount:tx.amount, Note:tx.note||'' };
+                });
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(txData.length ? txData : [{ Message:'No transactions' }]), 'Transactions');
+                
+                const allTx = this.data.transactions;
+                const userSummary = this.data.users.map(u => {
+                    let inc=0,exp=0,lnt=0,brw=0,sav=0;
+                    allTx.forEach(tx => { 
+                        if(tx.userId===u.id) { 
+                            const a=Number(tx.amount); 
+                            if(tx.type==='income') inc+=a; 
+                            if(tx.type==='expense') exp+=a; 
+                            if(tx.type==='lent') lnt+=a; 
+                            if(tx.type==='lent_returned') lnt-=a; 
+                            if(tx.type==='borrowed') brw+=a; 
+                            if(tx.type==='borrowed_returned') brw-=a;
+                            if(tx.type==='savings') sav+=a; 
+                            if(tx.type==='withdraw_savings') sav-=a; 
+                        } 
+                    });
+                    return { User:u.name, 'Net Balance':(inc+brw)-(exp+lnt+sav), 'Total Income':inc, 'Total Expense':exp, 'Net Lent':lnt, 'Net Borrowed':brw, 'Net Savings':sav };
+                });
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(userSummary.length ? userSummary : [{ Message:'No users' }]), 'User Summary');
+                
+                const monthlyData = {};
+                allTx.forEach(tx => {
+                    const date = new Date(tx.date), my = date.toLocaleString('en-GB',{month:'short',year:'numeric'});
+                    if(!monthlyData[my]) monthlyData[my] = { Month:my, Income:0, Expense:0, Net_Lent:0, Net_Borrowed:0, Net_Savings:0 };
+                    const a = Number(tx.amount);
+                    if(tx.type==='income') monthlyData[my].Income+=a; if(tx.type==='expense') monthlyData[my].Expense+=a;
+                    if(tx.type==='lent') monthlyData[my].Net_Lent+=a; if(tx.type==='lent_returned') monthlyData[my].Net_Lent-=a;
+                    if(tx.type==='borrowed') monthlyData[my].Net_Borrowed+=a; if(tx.type==='borrowed_returned') monthlyData[my].Net_Borrowed-=a;
+                    if(tx.type==='savings') monthlyData[my].Net_Savings+=a; if(tx.type==='withdraw_savings') monthlyData[my].Net_Savings-=a;
+                });
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(Object.values(monthlyData).length ? Object.values(monthlyData) : [{ Message:'No data' }]), 'Monthly Breakdown');
+                
+                XLSX.writeFile(wb, `Shared_Wallet_${this.data.name.replace(/[^a-z0-9]/gi,'_').toLowerCase()}_Backup.xlsx`);
+                this.showToast('Excel Backup Exported!');
+            } catch(error) { console.error(error); this.showToast('Failed to export Excel.', 'error'); }
+        }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => { app.init(); });
+    </script>
+</body>
+</html>

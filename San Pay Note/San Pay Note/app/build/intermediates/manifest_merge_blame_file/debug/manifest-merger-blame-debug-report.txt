@@ -1,0 +1,332 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.sanpaynote.com"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- Networking -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:6:5-67
+12-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:6:22-64
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:7:5-79
+13-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:7:22-76
+14
+15    <!-- Storage (maxSdkVersion avoids popup on Android 10+) -->
+16    <uses-permission
+16-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:10:5-11:38
+17        android:name="android.permission.READ_EXTERNAL_STORAGE"
+17-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:10:22-77
+18        android:maxSdkVersion="32" />
+18-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:11:9-35
+19    <uses-permission
+19-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:12:5-13:38
+20        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+20-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:12:22-78
+21        android:maxSdkVersion="29" />
+21-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:13:9-35
+22
+23    <!--
+24        Package Visibility (Android 11+ / API 30+)
+25        Without <queries>, resolveActivity() always returns null for other apps
+26        even when they are installed. Declaring schemes here grants visibility.
+27    -->
+28    <queries>
+28-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:20:5-86:15
+29
+30        <!-- WhatsApp direct open -->
+31        <package android:name="com.whatsapp" />
+31-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:22:9-48
+31-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:22:18-45
+32        <package android:name="com.whatsapp.w4b" />
+32-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:23:9-52
+32-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:23:18-49
+33        <!-- UPI payment apps -->
+34        <package android:name="com.google.android.apps.nbu.paisa.user" />
+34-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:25:9-74
+34-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:25:18-71
+35        <package android:name="net.one97.paytm" />
+35-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:26:9-51
+35-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:26:18-48
+36        <package android:name="com.phonepe.app" />
+36-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:27:9-51
+36-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:27:18-48
+37        <package android:name="in.amazon.mShop.android.shopping" />
+37-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:28:9-68
+37-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:28:18-65
+38        <package android:name="com.mobikwik_new" />
+38-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:29:9-52
+38-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:29:18-49
+39        <package android:name="com.freecharge.android" />
+39-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:30:9-58
+39-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:30:18-55
+40        <package android:name="com.upi.axispay" />
+40-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:31:9-51
+40-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:31:18-48
+41        <package android:name="com.sbi.upi" />
+41-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:32:9-47
+41-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:32:18-44
+42        <!-- Telegram -->
+43        <package android:name="org.telegram.messenger" />
+43-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:34:9-58
+43-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:34:18-55
+44        <!-- Instagram -->
+45        <package android:name="com.instagram.android" />
+45-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:36:9-57
+45-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:36:18-54
+46        <!-- YouTube -->
+47        <package android:name="com.google.android.youtube" />
+47-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:38:9-62
+47-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:38:18-59
+48        <!-- Browser intent -->
+49        <intent>
+49-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:40:9-43:18
+50            <action android:name="android.intent.action.VIEW" />
+50-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+50-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+51
+52            <data android:scheme="https" />
+52-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+52-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+53        </intent>
+54        <intent>
+54-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:44:9-47:18
+55            <action android:name="android.intent.action.VIEW" />
+55-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+55-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+56
+57            <data android:scheme="http" />
+57-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+57-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+58        </intent>
+59        <!-- WhatsApp scheme -->
+60        <intent>
+60-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:49:9-52:18
+61            <action android:name="android.intent.action.VIEW" />
+61-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+61-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+62
+63            <data android:scheme="whatsapp" />
+63-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+63-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+64        </intent>
+65        <!-- UPI scheme -->
+66        <intent>
+66-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:54:9-57:18
+67            <action android:name="android.intent.action.VIEW" />
+67-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+67-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+68
+69            <data android:scheme="upi" />
+69-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+69-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+70        </intent>
+71        <!-- Phone dialer -->
+72        <intent>
+72-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:59:9-61:18
+73            <action android:name="android.intent.action.DIAL" />
+73-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:60:13-65
+73-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:60:21-62
+74        </intent>
+75        <intent>
+75-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:62:9-65:18
+76            <action android:name="android.intent.action.CALL" />
+76-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:63:13-65
+76-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:63:21-62
+77
+78            <data android:scheme="tel" />
+78-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+78-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+79        </intent>
+80        <!-- Email -->
+81        <intent>
+81-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:67:9-70:18
+82            <action android:name="android.intent.action.SENDTO" />
+82-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:68:13-67
+82-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:68:21-64
+83
+84            <data android:scheme="mailto" />
+84-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+84-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+85        </intent>
+86        <!-- Telegram scheme -->
+87        <intent>
+87-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:72:9-75:18
+88            <action android:name="android.intent.action.VIEW" />
+88-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+88-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+89
+90            <data android:scheme="tg" />
+90-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+90-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+91        </intent>
+92        <!-- Maps -->
+93        <intent>
+93-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:77:9-80:18
+94            <action android:name="android.intent.action.VIEW" />
+94-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+94-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+95
+96            <data android:scheme="geo" />
+96-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+96-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+97        </intent>
+98        <!-- Play Store -->
+99        <intent>
+99-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:82:9-85:18
+100            <action android:name="android.intent.action.VIEW" />
+100-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:13-65
+100-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:41:21-62
+101
+102            <data android:scheme="market" />
+102-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:13-44
+102-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:42:19-41
+103        </intent>
+104    </queries>
+105
+106    <permission
+106-->[androidx.core:core:1.12.0] C:\Users\santh\.gradle\caches\transforms-3\de8c3b838232e943fc8a6a53f2c25d4a\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+107        android:name="com.sanpaynote.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+107-->[androidx.core:core:1.12.0] C:\Users\santh\.gradle\caches\transforms-3\de8c3b838232e943fc8a6a53f2c25d4a\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+108        android:protectionLevel="signature" />
+108-->[androidx.core:core:1.12.0] C:\Users\santh\.gradle\caches\transforms-3\de8c3b838232e943fc8a6a53f2c25d4a\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+109
+110    <uses-permission android:name="com.sanpaynote.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+110-->[androidx.core:core:1.12.0] C:\Users\santh\.gradle\caches\transforms-3\de8c3b838232e943fc8a6a53f2c25d4a\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+110-->[androidx.core:core:1.12.0] C:\Users\santh\.gradle\caches\transforms-3\de8c3b838232e943fc8a6a53f2c25d4a\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+111
+112    <application
+112-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:88:5-120:19
+113        android:allowBackup="true"
+113-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:89:9-35
+114        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+114-->[androidx.core:core:1.12.0] C:\Users\santh\.gradle\caches\transforms-3\de8c3b838232e943fc8a6a53f2c25d4a\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+115        android:debuggable="true"
+116        android:extractNativeLibs="false"
+117        android:icon="@mipmap/ic_launcher"
+117-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:90:9-43
+118        android:label="San Pay Note"
+118-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:91:9-37
+119        android:networkSecurityConfig="@xml/network_security_config"
+119-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:97:9-69
+120        android:requestLegacyExternalStorage="true"
+120-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:96:9-52
+121        android:roundIcon="@mipmap/ic_launcher_round"
+121-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:92:9-54
+122        android:supportsRtl="true"
+122-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:93:9-35
+123        android:theme="@style/AppTheme"
+123-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:94:9-40
+124        android:usesCleartextTraffic="true" >
+124-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:95:9-44
+125        <activity
+125-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:99:9-108:20
+126            android:name="com.sanpaynote.com.MainActivity"
+126-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:100:13-41
+127            android:configChanges="orientation|screenSize|keyboardHidden|keyboard"
+127-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:103:13-83
+128            android:exported="true"
+128-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:101:13-36
+129            android:windowSoftInputMode="adjustResize" >
+129-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:102:13-55
+130            <intent-filter>
+130-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:104:13-107:29
+131                <action android:name="android.intent.action.MAIN" />
+131-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:105:17-69
+131-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:105:25-66
+132
+133                <category android:name="android.intent.category.LAUNCHER" />
+133-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:106:17-77
+133-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:106:27-74
+134            </intent-filter>
+135        </activity>
+136
+137        <provider
+137-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:110:9-118:20
+138            android:name="androidx.core.content.FileProvider"
+138-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:111:13-62
+139            android:authorities="com.sanpaynote.com.fileprovider"
+139-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:112:13-66
+140            android:exported="false"
+140-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:113:13-37
+141            android:grantUriPermissions="true" >
+141-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:114:13-47
+142            <meta-data
+142-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:115:13-117:63
+143                android:name="android.support.FILE_PROVIDER_PATHS"
+143-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:116:17-67
+144                android:resource="@xml/file_provider_paths" />
+144-->D:\Claud\HTML_to_APK_Converter_v4_2\HTML_to_APK_Converter\build\android_project\app\src\main\AndroidManifest.xml:117:17-60
+145        </provider>
+146        <provider
+146-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+147            android:name="androidx.startup.InitializationProvider"
+147-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
+148            android:authorities="com.sanpaynote.com.androidx-startup"
+148-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
+149            android:exported="false" >
+149-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
+150            <meta-data
+150-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+151                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+151-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
+152                android:value="androidx.startup" />
+152-->[androidx.emoji2:emoji2:1.2.0] C:\Users\santh\.gradle\caches\transforms-3\6db5aa862a49de8667f2a7b9b0bf2022\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
+153            <meta-data
+153-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\santh\.gradle\caches\transforms-3\adfd241d31aa0dc8d9176e9f5dfaa47e\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+154                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+154-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\santh\.gradle\caches\transforms-3\adfd241d31aa0dc8d9176e9f5dfaa47e\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+155                android:value="androidx.startup" />
+155-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\santh\.gradle\caches\transforms-3\adfd241d31aa0dc8d9176e9f5dfaa47e\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+156            <meta-data
+156-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+157                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+157-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+158                android:value="androidx.startup" />
+158-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+159        </provider>
+160
+161        <receiver
+161-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+162            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+162-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+163            android:directBootAware="false"
+163-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+164            android:enabled="true"
+164-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+165            android:exported="true"
+165-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+166            android:permission="android.permission.DUMP" >
+166-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+167            <intent-filter>
+167-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+168                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+168-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+168-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+169            </intent-filter>
+170            <intent-filter>
+170-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+171                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+171-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+171-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+172            </intent-filter>
+173            <intent-filter>
+173-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+174                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+174-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+174-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+175            </intent-filter>
+176            <intent-filter>
+176-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+177                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+177-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+177-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\santh\.gradle\caches\transforms-3\0db8f035745ab68a2782efc838399652\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+178            </intent-filter>
+179        </receiver>
+180    </application>
+181
+182</manifest>
