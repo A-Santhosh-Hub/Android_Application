@@ -19,11 +19,9 @@ Everything stays on your device natively, with an exclusive one-click backup sys
 
 ## **📸 Screenshots**
 
-*(Add screenshots of your Android app here)*
-
 | **Dashboard** | **Lent Tracker** | **Auto Pay** | **Google Sheets Sync** |
 
-| \<img src="1.jpeg" width="200"/\> | \<img src="2.jpeg" width="200"/\> | \<img src="3.jpeg" width="200"/\> | \<img src="4.jpeg" width="200"/\> |
+| <img src="1.jpeg" width="200"/> | <img src="2.jpeg" width="200"/> | <img src="3.jpeg" width="200"/> | <img src="4.jpeg" width="200"/> |
 
 ## **🛠️ Installation**
 
