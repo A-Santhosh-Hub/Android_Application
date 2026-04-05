@@ -1,0 +1,4 @@
+#Wed Mar 11 08:25:55 IST 2026
+base.0=D\:\\Claud\\HTML_to_APK_Converter_v4\\HTML_to_APK_Converter\\build\\android_project\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\0\\classes.dex
+path.0=0/classes.dex
+renamed.0=classes.dex

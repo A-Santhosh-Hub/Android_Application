@@ -1,0 +1,10 @@
+#Wed Mar 11 08:25:55 IST 2026
+base.0=D\:\\Claud\\HTML_to_APK_Converter_v4\\HTML_to_APK_Converter\\build\\android_project\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\Claud\\HTML_to_APK_Converter_v4\\HTML_to_APK_Converter\\build\\android_project\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.2=D\:\\Claud\\HTML_to_APK_Converter_v4\\HTML_to_APK_Converter\\build\\android_project\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
+path.0=classes.dex
+path.1=0/classes.dex
+path.2=15/classes.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex
+renamed.2=classes3.dex

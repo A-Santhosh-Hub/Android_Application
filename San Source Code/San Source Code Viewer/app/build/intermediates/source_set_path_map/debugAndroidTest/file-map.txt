@@ -1,0 +1,4 @@
+com.santhosh.sourcecodeviewer.test.app-androidTest-0 D:\Claud\HTML_to_APK_Converter_v4\HTML_to_APK_Converter\build\android_project\app\build\generated\res\resValues\androidTest\debug
+com.santhosh.sourcecodeviewer.test.app-mergeDebugAndroidTestResources-1 D:\Claud\HTML_to_APK_Converter_v4\HTML_to_APK_Converter\build\android_project\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.santhosh.sourcecodeviewer.test.app-mergeDebugAndroidTestResources-2 D:\Claud\HTML_to_APK_Converter_v4\HTML_to_APK_Converter\build\android_project\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.santhosh.sourcecodeviewer.test.app-merged_res-3 D:\Claud\HTML_to_APK_Converter_v4\HTML_to_APK_Converter\build\android_project\app\build\intermediates\merged_res\debugAndroidTest
