@@ -2,15 +2,11 @@
 
 =============================
 
-### 1.Firecracker Order ## SanCracker
+# 1.Firecracker Order ## SanCracker
+# 📸 Preview
+<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg" width="220">
 
-
-### 📸 Preview
-
-<img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg" width="220"><img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s1.jpg" width="220">
-
-
-## 💰 San Money – Multiple Person Money Management App
+# 💰 San Money – Multiple Person Money Management App
 
 San Money is a simple and clean application designed to help users manage and view money-related information in an easy and organized way. The app provides a minimal interface where users can explore financial tools, track useful money resources, and access helpful financial platforms in one place.
 
