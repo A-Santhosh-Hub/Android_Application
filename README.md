@@ -2,7 +2,7 @@
 
 =============================
 
-# 1.Firecracker Order ## SanCracker
+# 1.Firecracker Order  SanCracker
 # 📸 Preview
 <img src="https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Firecracker%20Order/s2.jpg" width="220">
 
@@ -27,7 +27,7 @@ Developed by **SanStudio**
 
 
 
-📞 San Dial – Simple Android Phone Dialer  2
+# Project 2 - 📞 San Dial – Simple Android Phone Dialer  2
 
 # 📞 San Dial – Simple Android Phone Dialer
 
