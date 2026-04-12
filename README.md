@@ -37,7 +37,9 @@ The goal of San Dial is to provide a modern and minimal dialing experience witho
 
 San Dial also supports light and dark mode themes to match the system appearance and improve usability in different lighting environments. The application is built using Kotlin in Android Studio with a structured MVVM architecture and local storage support.
 
-This project focuses on simplicity, performance, and a modern mobile UI design.
+This project focuses on simplicity, performance, and a modern mobile UI design. 
+
+# New Feature like [ schedule call section with if you close the app, it's run background to make a call and then new separate section for schedule calls, which have you set the schedule calls, you can see that section and manage them. Then add a new message under Telegram. If you long press the number, then it automatically open message Telegram and WhatsApp. You can click to redirect to WhatsApp with that number user. And then new UI/UX update like OriginOS 6 style and Fount, Android 16, UI/UX. ]
 
 Developed by **SanStudio**  
 🌐 https://a-santhosh-hub.github.io/in/
