@@ -42,15 +42,6 @@ This project focuses on simplicity, performance, and a modern mobile UI design.
 Developed by **SanStudio**  
 🌐 https://a-santhosh-hub.github.io/in/
 
----
-
-## App Screenshots
-
-<img src="screenshots/dialer.png" width="220">
-<img src="screenshots/recents.png" width="220">
-<img src="screenshots/contacts.png" width="220">
-<img src="screenshots/favorites.png" width="220">
-<img src="screenshots/darkmode.png" width="220">
 
 ---
 
