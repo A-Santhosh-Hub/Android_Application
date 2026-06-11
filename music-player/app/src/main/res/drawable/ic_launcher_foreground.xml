@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Sound Wave Arcs representing audio playing -->
+    <path
+        android:strokeWidth="4"
+        android:strokeColor="#FF22B6"
+        android:strokeLineCap="round"
+        android:pathData="M24,54 A30,30 0 0 1 84,54" />
+    <path
+        android:strokeWidth="4"
+        android:strokeColor="#00E5FF"
+        android:strokeLineCap="round"
+        android:pathData="M16,54 A38,38 0 0 1 92,54" />
+    
+    <!-- Bold Filled Music Note -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M52,24v34.32c-1.35,-0.83 -3.07,-1.32 -4.95,-1.32 -4.42,0 -8,3.58 -8,8s3.58,8 8,8 8,-3.58 8,-8V34h12v-10h-12z" />
+</vector>

@@ -1,0 +1,6 @@
+{
+  "name": "Music Player",
+  "description": "A high-fidelity Music Player with offline streaming, interactive custom equalizer, visual audio visualizers, and polished dark mode support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
