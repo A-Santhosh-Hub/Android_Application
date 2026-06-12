@@ -1,0 +1,44 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Subtle drop shadow of Notepad container -->
+    <path
+        android:fillColor="#1F000000"
+        android:pathData="M 31.5,28.5 L 76.5,28.5 A 5,5 0 0 1 81.5,33.5 L 81.5,78.5 A 5,5 0 0 1 76.5,83.5 L 31.5,83.5 A 5,5 0 0 1 26.5,78.5 L 26.5,33.5 A 5,5 0 0 1 31.5,28.5 Z" />
+        
+    <!-- Main White Pad Backing Layer -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 31,27 L 77,27 A 4,4 0 0 1 81,31 L 81,77 A 4,4 0 0 1 77,81 L 31,81 A 4,4 0 0 1 27,77 L 27,31 A 4,4 0 0 1 31,27 Z" />
+
+    <!-- Google Keep-style golden header band on the notepad -->
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M 31,27 L 77,27 A 4,4 0 0 1 81,31 L 81,42 L 27,42 L 27,31 A 4,4 0 0 1 31,27 Z" />
+
+    <!-- Notebook horizontal list lines detail -->
+    <!-- Line 1 -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M 34,48 L 74,48 L 74,50 L 34,50 Z" />
+    <!-- Line 2 -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M 34,56 L 62,56 L 62,58 L 34,58 Z" />
+    <!-- Line 3 -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M 34,64 L 71,64 L 71,66 L 34,66 Z" />
+    <!-- Line 4 -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M 34,72 L 58,72 L 58,74 L 34,74 Z" />
+
+    <!-- Centered orange idea lightbulb representing Keep dynamic thoughts -->
+    <path
+        android:fillColor="#E65100"
+        android:pathData="M 54,30 C 51.5,30 49.5,32 49.5,34.5 C 49.5,36.1 50.4,37.5 51.7,38.2 L 51.7,40.5 L 56.3,40.5 L 56.3,38.2 C 57.6,37.5 58.5,36.1 58.5,34.5 C 58.5,32 56.5,30 54,30 Z M 52.5,41.5 L 55.5,41.5 L 55.5,42.5 L 52.5,42.5 Z M 53,43.5 L 55,43.5 L 55,44.5 L 53,44.5 Z" />
+</vector>

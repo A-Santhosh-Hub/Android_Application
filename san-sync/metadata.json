@@ -1,0 +1,6 @@
+{
+  "name": "San Sync",
+  "description": "A high-fidelity Google Keep clone featuring checklist toggles, drawing sketchpads, label management, archive/bin views, grid/list adapters, and custom styling with full local state persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
