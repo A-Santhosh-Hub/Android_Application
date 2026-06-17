@@ -146,7 +146,7 @@ This tool is built for **construction site supervisors, storekeepers, and small 
 - **WorkManager** (optional auto-sync)
 - **Gmail Intent-based Sync**
 
----
+------
 
 ## 🗂️ Project Structure (Web)
 
