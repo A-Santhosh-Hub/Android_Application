@@ -1,0 +1,6 @@
+{
+  "name": "ALP Astrology CRM",
+  "description": "Enterprise CRM and Architecture Suite for Akshaya Lagna Paddhati Astrology operations, lead management, and student enrollments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
