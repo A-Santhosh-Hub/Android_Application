@@ -21,7 +21,8 @@ A Brave-inspired, user-first Android application designed for students to downlo
 - **Storage**: External Storage (Downloads/SanTube directory)
 
 ## 📦 Setup and Installation
-
+![App Screenshot](https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Edu%20Video%20Downloader/Screenshot/1.jpeg)
+![App Screenshot](https://github.com/A-Santhosh-Hub/Android_Application/blob/main/Edu%20Video%20Downloader/Screenshot/2.jpeg)
 ### Prerequisites
 - Android Studio Iguana or newer
 - Android SDK 26+ (Android 8.0+)
