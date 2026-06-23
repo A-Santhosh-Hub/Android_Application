@@ -2,6 +2,8 @@
 
 A Brave-inspired, user-first Android application designed for students to download, manage, and share educational content offline.
 
+DOWNLOAD LINK : https://drive.google.com/file/d/1zl6MD22_98vhoBQHtYGmVDdvyh9Hb7Al/view?usp=sharing .... IT's Good 
+
 ## 🚀 Key Features
 
 - **Multi-Platform Support**: Effortlessly download videos from YouTube, Instagram, and Facebook.
