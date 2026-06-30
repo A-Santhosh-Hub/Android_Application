@@ -1,5 +1,3 @@
----
-
 # Text to All Text | VS Code Edition 🚀
 
 **Text to All Text** is a powerful, browser-based multi-utility workspace designed with a Visual Studio Code-inspired interface. Built by the **SanStudio Developer Team**, this all-in-one tool operates entirely on the client side. It combines a code editor, media player, document processor, and dozens of developer utilities into a single, seamless, and responsive web application.
