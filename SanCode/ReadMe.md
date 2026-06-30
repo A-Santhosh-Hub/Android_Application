@@ -1,5 +1,3 @@
-Here is a comprehensive and professionally formatted `README.md` file tailored specifically to the features, libraries, and functionality present in your code.
-
 ---
 
 # Text to All Text | VS Code Edition 🚀
