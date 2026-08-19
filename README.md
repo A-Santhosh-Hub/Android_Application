@@ -161,5 +161,5 @@ This tool is built for **construction site supervisors, storekeepers, and small 
 
 # New Project Is Loading: SanDial Note [CallMind aims to become a personal communication memory assistant that helps users remember conversations, organize relationships, schedule follow-ups, and quickly continue communication across different platforms.]
 
-# Working ON SANTUPE
+# Working ON CALL MIND
 # SanTube : so this is app full for educational purpose like you can download the multiple three main media platform like Instagram YouTube Facebook and some supported platform link you can download the video like tutorial videos you can download that it will be soon to launch in this Drive Link : https://drive.google.com/file/d/1CuHC3ZEG5Nhs_BkQpzJuugMj4AG0ZveC/view?usp=sharing 
