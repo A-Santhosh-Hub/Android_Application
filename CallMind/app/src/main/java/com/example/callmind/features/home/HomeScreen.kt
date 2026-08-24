@@ -204,7 +204,7 @@ fun TodayCommunicationCard(state: HomeState) {
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(24.dp)
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) { // Reduced padding
             Text(
                 text = "Today's communication",
                 style = MaterialTheme.typography.titleMedium,
@@ -212,13 +212,13 @@ fun TodayCommunicationCard(state: HomeState) {
                 fontWeight = FontWeight.Bold
             )
             
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(20.dp)) // Reduced height
             
             Row(modifier = Modifier.fillMaxWidth()) {
                 StatItemVertical(Icons.Default.Call, state.callCount.toString(), "Calls", modifier = Modifier.weight(1f))
-                Box(modifier = Modifier.width(1.dp).height(40.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)).align(Alignment.CenterVertically))
+                Box(modifier = Modifier.width(1.dp).height(32.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)).align(Alignment.CenterVertically))
                 StatItemVertical(Icons.Default.DateRange, state.totalTalkTime, "Talk time", modifier = Modifier.weight(1.2f))
-                Box(modifier = Modifier.width(1.dp).height(40.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)).align(Alignment.CenterVertically))
+                Box(modifier = Modifier.width(1.dp).height(32.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)).align(Alignment.CenterVertically))
                 StatItemVertical(Icons.Default.Edit, state.noteCount.toString(), "Notes", modifier = Modifier.weight(1f))
             }
         }
@@ -230,15 +230,15 @@ fun StatItemVertical(icon: ImageVector, value: String, label: String, modifier: 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(36.dp) // Reduced from 40
                 .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(text = value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface) // Changed from titleLarge
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
     }
 }
 
@@ -251,23 +251,66 @@ fun QuickActionsCard(
     onTelegram: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), // Reduced vertical padding
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(24.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Quick actions", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                ActionCircleButton(Icons.Default.Call, "Call", AccentGreen, onClick = onCall)
-                ActionCircleButton(Icons.Default.Phone, "WhatsApp", AccentWhatsApp, onClick = onWhatsApp)
-                ActionCircleButton(Icons.AutoMirrored.Filled.Send, "Telegram", AccentTelegram, onClick = onTelegram)
-                ActionCircleButton(Icons.Default.Search, "Search", MaterialTheme.colorScheme.primary, onClick = onSearch)
-                ActionCircleButton(Icons.Default.Edit, "Note", AccentNotes, onClick = onNotes)
+            // Redesigned to 2 rows to fit better on mobile screens
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    ActionCircleButtonSmall(Icons.Default.Call, "Call", AccentGreen, onClick = onCall, modifier = Modifier.weight(1f))
+                    ActionCircleButtonSmall(Icons.Default.Phone, "WhatsApp", AccentWhatsApp, onClick = onWhatsApp, modifier = Modifier.weight(1f))
+                    ActionCircleButtonSmall(Icons.AutoMirrored.Filled.Send, "Telegram", AccentTelegram, onClick = onTelegram, modifier = Modifier.weight(1f))
+                    ActionCircleButtonSmall(Icons.Default.Search, "Search", MaterialTheme.colorScheme.primary, onClick = onSearch, modifier = Modifier.weight(1f))
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                    ActionCircleButtonSmall(Icons.Default.Edit, "Note", AccentNotes, onClick = onNotes, modifier = Modifier.fillMaxWidth(0.25f))
+                }
             }
         }
+    }
+}
+
+@Composable
+fun ActionCircleButtonSmall(
+    icon: ImageVector,
+    label: String,
+    backgroundColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp) // Reduced from 56
+                .clip(CircleShape)
+                .background(backgroundColor)
+                .clickable { onClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 10.sp,
+            maxLines = 1
+        )
     }
 }
 
@@ -354,12 +397,12 @@ fun RecentActivityItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp), // Reduced vertical from 16
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(40.dp) // Reduced from 48
                 .background(avatarColor, CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -368,14 +411,15 @@ fun RecentActivityItem(
                     text = call.contactName.take(1).uppercase(),
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp // Fixed size
                 )
             } else {
-                Icon(Icons.Default.Person, contentDescription = null, tint = Color.White)
+                Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
             }
         }
         
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -387,7 +431,7 @@ fun RecentActivityItem(
                         }
                     }
                 },
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp), // Slightly smaller
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -401,23 +445,24 @@ fun RecentActivityItem(
                         CallType.MISSED -> Icons.Default.Warning
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(12.dp),
+                    modifier = Modifier.size(10.dp), // Reduced from 12
                     tint = if (call.type == CallType.MISSED) AccentRed else AccentGreen
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${if(call.type == CallType.INCOMING) "Incoming" else if(call.type == CallType.OUTGOING) "Outgoing" else "Missed"} • 8 min ago",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 11.sp
                 )
             }
         }
         
         IconButton(
             onClick = { postCallViewModel?.callAgain(call.phoneNumber) },
-            modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape) // Reduced from 44
         ) {
-            Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(20.dp), tint = AccentGreen)
+            Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(18.dp), tint = AccentGreen)
         }
     }
 }
