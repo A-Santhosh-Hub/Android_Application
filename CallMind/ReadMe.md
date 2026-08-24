@@ -2329,4 +2329,6 @@ It is:
 
 **Developed by SanStudio**
 
-https://sanstudio-hub.github.io/in/
+https://sanstudio-hub.github.io/in/. 
+
+The APK Available CALL MIND
