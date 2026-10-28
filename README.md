@@ -161,7 +161,7 @@ This tool is built for **construction site supervisors, storekeepers, and small 
 
 # New Project Is Loading: SanDial Note [CallMind aims to become a personal communication memory assistant that helps users remember conversations, organize relationships, schedule follow-ups, and quickly continue communication across different platforms.]
 
-# ADD APK of CALL MIND
+#  CALL MIND
 
 # SanMusic
  
