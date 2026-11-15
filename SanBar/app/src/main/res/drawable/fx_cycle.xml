@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" android:oneshot="false">
+    <item android:duration="120"><shape><solid android:color="#FFFF1919" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFF5219" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFF8C19" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFFC519" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFFFF19" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFC5FF19" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF8CFF19" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF52FF19" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF19FF19" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF19FF52" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF19FF8C" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF19FFC5" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF19FFFF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF19C5FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF198CFF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF1952FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF1919FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF5219FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FF8C19FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFC519FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFF19FF" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFF19C5" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFF198C" /></shape></item>
+    <item android:duration="120"><shape><solid android:color="#FFFF1952" /></shape></item>
+</animation-list>

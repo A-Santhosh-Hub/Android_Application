@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SanBar</string>
+    <string name="stats_name">SanStats</string>
+    <string name="stats_widget_description">CPU usage, RAM and phone temperature rings</string>
+    <string name="widget_description">Music controls with phone and headphone battery in one full-width bar</string>
+</resources>

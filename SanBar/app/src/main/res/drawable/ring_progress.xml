@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Circular battery ring: grey track + green arc starting at 12 o'clock. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:innerRadiusRatio="2.5" android:shape="ring" android:thicknessRatio="12" android:useLevel="false">
+            <solid android:color="@color/track" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <rotate android:fromDegrees="270" android:pivotX="50%" android:pivotY="50%" android:toDegrees="270">
+            <shape android:innerRadiusRatio="2.5" android:shape="ring" android:thicknessRatio="12" android:useLevel="true">
+                <solid android:color="@color/accent" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

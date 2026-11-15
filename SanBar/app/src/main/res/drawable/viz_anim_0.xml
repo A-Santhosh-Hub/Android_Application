@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" android:oneshot="false">
+    <item android:duration="110">
+        <inset android:insetTop="31dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="13dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="24dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="7dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="20dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="2dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="15dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+    <item android:duration="110">
+        <inset android:insetTop="26dp"><shape><corners android:radius="2dp" /><solid android:color="#FFFFFFFF" /></shape></inset>
+    </item>
+</animation-list>

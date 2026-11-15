@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SanStats: CPU / RAM / TEMP rings, same RGB border + glass layers as SanBar. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_root"
+    android:clipToOutline="true">
+
+    <include layout="@layout/fx_layer" />
+
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_glass">
+
+    <LinearLayout
+        android:id="@+id/stats_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="4dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="38dp"
+                android:layout_height="38dp">
+
+                <ProgressBar
+                    android:id="@+id/ring_cpu"
+                    style="@android:style/Widget.Material.ProgressBar.Horizontal"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:maxWidth="38dp"
+                    android:maxHeight="38dp"
+                    android:minWidth="38dp"
+                    android:minHeight="38dp"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/ring_progress" />
+
+                <TextView
+                    android:id="@+id/val_cpu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="--"
+                    android:shadowColor="#CC000000"
+                    android:shadowDx="0"
+                    android:shadowDy="1"
+                    android:shadowRadius="4"
+                    android:textColor="@color/text"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/lbl_cpu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="CPU"
+                android:shadowColor="#CC000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="@color/text_dim"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="38dp"
+                android:layout_height="38dp">
+
+                <ProgressBar
+                    android:id="@+id/ring_ram"
+                    style="@android:style/Widget.Material.ProgressBar.Horizontal"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:maxWidth="38dp"
+                    android:maxHeight="38dp"
+                    android:minWidth="38dp"
+                    android:minHeight="38dp"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/ring_progress" />
+
+                <TextView
+                    android:id="@+id/val_ram"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="--"
+                    android:shadowColor="#CC000000"
+                    android:shadowDx="0"
+                    android:shadowDy="1"
+                    android:shadowRadius="4"
+                    android:textColor="@color/text"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/lbl_ram"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="RAM"
+                android:shadowColor="#CC000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="@color/text_dim"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="38dp"
+                android:layout_height="38dp">
+
+                <ProgressBar
+                    android:id="@+id/ring_temp"
+                    style="@android:style/Widget.Material.ProgressBar.Horizontal"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:maxWidth="38dp"
+                    android:maxHeight="38dp"
+                    android:minWidth="38dp"
+                    android:minHeight="38dp"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/ring_progress" />
+
+                <TextView
+                    android:id="@+id/val_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="--"
+                    android:shadowColor="#CC000000"
+                    android:shadowDx="0"
+                    android:shadowDy="1"
+                    android:shadowRadius="4"
+                    android:textColor="@color/text"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/lbl_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="TEMP"
+                android:shadowColor="#CC000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="@color/text_dim"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

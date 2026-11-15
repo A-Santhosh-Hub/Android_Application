@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#FF4ADE80</color>
+    <color name="on_accent">#FF0B0F0C</color>
+    <color name="text">#FFFFFFFF</color>
+    <color name="text_dim">#B3FFFFFF</color>
+    <color name="divider">#26FFFFFF</color>
+    <color name="track">#2EFFFFFF</color>
+    <!-- Dark see-through "glass", slightly green to sit on the green wallpaper. -->
+    <color name="glass">#B30C1410</color>
+    <color name="glass_edge">#22FFFFFF</color>
+    <color name="app_bg">#FF0B0F0C</color>
+</resources>

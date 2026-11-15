@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A green bar with a play triangle and a battery line: "SanBar". -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FF4ADE80"
+        android:pathData="M34,42h40a12,12 0 0 1 12,12a12,12 0 0 1 -12,12h-40a12,12 0 0 1 -12,-12a12,12 0 0 1 12,-12z" />
+    <path android:fillColor="#FF0B0F0C" android:pathData="M33,47.5l11,6.5l-11,6.5z" />
+    <path android:fillColor="#FF0B0F0C" android:pathData="M51,51h25a3,3 0 0 1 0,6h-25a3,3 0 0 1 0,-6z" />
+</vector>
