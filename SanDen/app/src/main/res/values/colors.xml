@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ── Brand Palette ──────────────────────────────────────────────── -->
+    <color name="sanden_primary">#1B6EF3</color>
+    <color name="sanden_primary_variant">#0D47A1</color>
+    <color name="sanden_on_primary">#FFFFFF</color>
+
+    <color name="sanden_secondary">#03DAC6</color>
+    <color name="sanden_secondary_variant">#018786</color>
+    <color name="sanden_on_secondary">#000000</color>
+
+    <color name="sanden_background">#FAFAFA</color>
+    <color name="sanden_on_background">#1C1B1F</color>
+
+    <color name="sanden_surface">#FFFFFF</color>
+    <color name="sanden_on_surface">#1C1B1F</color>
+
+    <color name="sanden_error">#B3261E</color>
+    <color name="sanden_on_error">#FFFFFF</color>
+
+    <!-- ── Category Accent Colors ─────────────────────────────────────── -->
+    <color name="category_images">#4CAF50</color>
+    <color name="category_videos">#F44336</color>
+    <color name="category_audio">#FF9800</color>
+    <color name="category_documents">#2196F3</color>
+    <color name="category_archives">#9C27B0</color>
+    <color name="category_other">#607D8B</color>
+
+    <!-- ── UI Helpers ─────────────────────────────────────────────────── -->
+    <color name="divider">#1F000000</color>
+    <color name="overlay_scrim">#80000000</color>
+    <color name="selection_highlight">#331B6EF3</color>
+
+</resources>

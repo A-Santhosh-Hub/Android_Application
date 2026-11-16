@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ── App ────────────────────────────────────────────────────────── -->
+    <string name="app_name">SanDen</string>
+    <string name="app_tagline">Your files. Your vault. Your rules.</string>
+
+    <!-- ── Common Actions ─────────────────────────────────────────────── -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="done">Done</string>
+    <string name="retry">Retry</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+    <string name="search_hint">Search files…</string>
+
+    <!-- ── Onboarding ─────────────────────────────────────────────────── -->
+    <string name="onboarding_welcome_title">Welcome to SanDen</string>
+    <string name="onboarding_welcome_desc">A secure vault for your private files. Import, organize, and protect what matters most.</string>
+    <string name="onboarding_storage_title">Choose Storage Mode</string>
+    <string name="onboarding_storage_desc">Pick how SanDen stores your files — in a private vault or a drop folder you can browse from any file manager.</string>
+    <string name="onboarding_permissions_title">Grant Permissions</string>
+    <string name="onboarding_permissions_desc">SanDen needs storage access to import and manage your files securely.</string>
+    <string name="onboarding_ready_title">You\'re All Set!</string>
+    <string name="onboarding_ready_desc">Start importing files into your vault. Drop files into the SanDen folder or use the import button.</string>
+    <string name="onboarding_get_started">Get Started</string>
+
+    <!-- ── Home / Dashboard ───────────────────────────────────────────── -->
+    <string name="home_title">Vault</string>
+    <string name="home_empty_title">Your vault is empty</string>
+    <string name="home_empty_desc">Tap the + button or drop files into your SanDen folder to get started.</string>
+    <string name="home_total_files">%d files</string>
+    <string name="home_storage_used">%s used</string>
+    <string name="home_recent_files">Recent Files</string>
+    <string name="home_all_files">All Files</string>
+
+    <!-- ── Categories ─────────────────────────────────────────────────── -->
+    <string name="category_all">All</string>
+    <string name="category_images">Images</string>
+    <string name="category_videos">Videos</string>
+    <string name="category_audio">Audio</string>
+    <string name="category_documents">Documents</string>
+    <string name="category_archives">Archives</string>
+    <string name="category_other">Other</string>
+    <string name="category_count">%d items</string>
+
+    <!-- ── File Operations ────────────────────────────────────────────── -->
+    <string name="import_files">Import Files</string>
+    <string name="export_files">Export Files</string>
+    <string name="move_files">Move Files</string>
+    <string name="delete_files">Delete Files</string>
+    <string name="rename_file">Rename</string>
+    <string name="share_file">Share</string>
+    <string name="file_details">Details</string>
+    <string name="open_with">Open With…</string>
+
+    <!-- ── Import ─────────────────────────────────────────────────────── -->
+    <string name="importing_files">Importing files…</string>
+    <string name="import_complete">Import Complete</string>
+    <string name="import_complete_detail">%d files imported successfully</string>
+    <string name="import_complete_with_errors">%1$d of %2$d imported (%3$d failed)</string>
+    <string name="import_cancelled">Import Cancelled</string>
+    <string name="import_cancelled_detail">%1$d of %2$d files imported before cancellation</string>
+
+    <!-- ── Export ─────────────────────────────────────────────────────── -->
+    <string name="exporting_files">Exporting files…</string>
+    <string name="export_complete">Export Complete</string>
+    <string name="export_complete_detail">%d files exported successfully</string>
+    <string name="export_complete_with_errors">%1$d of %2$d exported (%3$d failed)</string>
+    <string name="export_cancelled">Export Cancelled</string>
+    <string name="export_cancelled_detail">%1$d of %2$d files exported before cancellation</string>
+    <string name="export_destination_title">Export to…</string>
+
+    <!-- ── Delete ─────────────────────────────────────────────────────── -->
+    <string name="deleting_files">Deleting files…</string>
+    <string name="delete_complete">Delete Complete</string>
+    <string name="delete_complete_detail">%d files deleted</string>
+    <string name="delete_complete_with_errors">%1$d of %2$d deleted (%3$d failed)</string>
+    <string name="delete_cancelled">Delete Cancelled</string>
+    <string name="delete_cancelled_detail">%1$d of %2$d files deleted before cancellation</string>
+
+    <!-- ── Move ───────────────────────────────────────────────────────── -->
+    <string name="moving_files">Moving files…</string>
+    <string name="move_complete">Move Complete</string>
+    <string name="move_complete_detail">%d files moved successfully</string>
+    <string name="move_complete_with_errors">%1$d of %2$d moved (%3$d failed)</string>
+    <string name="move_cancelled">Move Cancelled</string>
+    <string name="move_cancelled_detail">%1$d of %2$d files moved before cancellation</string>
+
+    <!-- ── Dialogs ────────────────────────────────────────────────────── -->
+    <string name="dialog_delete_title">Delete Files?</string>
+    <string name="dialog_delete_message">Are you sure you want to permanently delete %d file(s)? This cannot be undone.</string>
+    <string name="dialog_delete_single_message">Are you sure you want to permanently delete \"%s\"? This cannot be undone.</string>
+    <string name="dialog_rename_title">Rename File</string>
+    <string name="dialog_rename_hint">Enter new name</string>
+    <string name="dialog_storage_mode_title">Switch Storage Mode</string>
+    <string name="dialog_storage_mode_message">Changing the storage mode will affect how new files are stored. Existing files will remain in their current location.</string>
+
+    <!-- ── Settings ───────────────────────────────────────────────────── -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_storage_mode">Storage Mode</string>
+    <string name="settings_storage_mode_drop">Drop Folder (accessible via file manager)</string>
+    <string name="settings_storage_mode_private">Private Import (app-only access)</string>
+    <string name="settings_auto_scan">Auto-Scan Drop Folder</string>
+    <string name="settings_auto_scan_desc">Automatically detect new files in the SanDen folder</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_about">About SanDen</string>
+    <string name="settings_version">Version %s</string>
+    <string name="settings_clear_cache">Clear Thumbnail Cache</string>
+    <string name="settings_clear_cache_desc">Free up space by removing cached thumbnails</string>
+    <string name="settings_cache_cleared">Thumbnail cache cleared</string>
+
+    <!-- ── Errors ─────────────────────────────────────────────────────── -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_file_not_found">File not found. It may have been moved or deleted.</string>
+    <string name="error_permission_denied">Storage permission is required to continue.</string>
+    <string name="error_permission_denied_action">Grant Permission</string>
+    <string name="error_low_storage_title">Low Storage</string>
+    <string name="error_low_storage_message">Not enough storage space to complete this operation. Free up space and try again.</string>
+    <string name="error_file_in_use">This file is currently in use and cannot be modified.</string>
+    <string name="error_import_failed">Failed to import one or more files.</string>
+    <string name="error_export_failed">Failed to export one or more files.</string>
+    <string name="error_no_app_to_open">No app found to open this file type.</string>
+    <string name="error_rename_failed">Failed to rename the file. The name may already be in use.</string>
+
+    <!-- ── Permissions ────────────────────────────────────────────────── -->
+    <string name="permission_storage_rationale">SanDen needs storage access to import and manage your files. Without it, the app cannot function.</string>
+    <string name="permission_notification_rationale">Allow notifications to see progress updates during file operations.</string>
+    <string name="permission_go_to_settings">Open Settings</string>
+
+    <!-- ── Empty States ───────────────────────────────────────────────── -->
+    <string name="empty_category">No %s files yet</string>
+    <string name="empty_search">No files match your search</string>
+
+    <!-- ── File Info ──────────────────────────────────────────────────── -->
+    <string name="file_info_name">Name</string>
+    <string name="file_info_size">Size</string>
+    <string name="file_info_type">Type</string>
+    <string name="file_info_date_added">Date Added</string>
+    <string name="file_info_date_modified">Date Modified</string>
+    <string name="file_info_path">Path</string>
+    <string name="file_info_category">Category</string>
+
+    <!-- ── Sort / Filter ──────────────────────────────────────────────── -->
+    <string name="sort_by">Sort by</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_date_added">Date Added</string>
+    <string name="sort_date_modified">Date Modified</string>
+    <string name="sort_size">Size</string>
+    <string name="sort_ascending">Ascending</string>
+    <string name="sort_descending">Descending</string>
+
+    <!-- ── Misc ───────────────────────────────────────────────────────── -->
+    <string name="notification_channel_file_ops">File Operations</string>
+    <string name="selected_count">%d selected</string>
+    <string name="storage_mode_drop_folder">Drop Folder</string>
+    <string name="storage_mode_private_import">Private Import</string>
+
+</resources>

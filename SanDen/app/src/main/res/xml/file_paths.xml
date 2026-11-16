@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+
+    <!-- Public drop folder on external storage: /storage/emulated/0/SanDen/ -->
+    <external-path
+        name="sanden_drop"
+        path="SanDen/" />
+
+    <!-- Private vault inside app-internal files dir: /data/data/com.sanden/files/vault/ -->
+    <files-path
+        name="vault"
+        path="vault/" />
+
+    <!-- Thumbnail cache: /data/data/com.sanden/cache/thumbnails/ -->
+    <cache-path
+        name="thumbnails"
+        path="thumbnails/" />
+
+    <!-- Downloads folder for export: /storage/emulated/0/Download/ -->
+    <external-path
+        name="downloads_export"
+        path="Download/" />
+
+</paths>
