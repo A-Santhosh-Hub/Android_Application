@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
@@ -55,6 +57,7 @@ class VaultRepositoryImpl @Inject constructor(
     }
 
     private val storage get() = storageModeManager.getStorage()
+    private val scanMutex = Mutex()
 
     // ── Queries ────────────────────────────────────────────────────────
 
@@ -94,52 +97,54 @@ class VaultRepositoryImpl @Inject constructor(
 
     // ── Scanning & Sync ────────────────────────────────────────────────
 
-    override suspend fun scanVault(): ScanResult = withContext(Dispatchers.IO) {
-        ensureVaultReady()
-        processInbox()
+    override suspend fun scanVault(): ScanResult = scanMutex.withLock {
+        withContext(Dispatchers.IO) {
+            ensureVaultReady()
+            processInbox()
 
-        val vaultPath = storage.getInternalVaultPath()
-        val currentFiles = fileScanner.scanDirectoryDirect(vaultPath)
-        Log.i(TAG, "Scanned $vaultPath, found ${currentFiles.size} file(s) on disk")
+            val vaultPath = storage.getInternalVaultPath()
+            val currentFiles = fileScanner.scanDirectoryDirect(vaultPath)
+            Log.i(TAG, "Scanned $vaultPath, found ${currentFiles.size} file(s) on disk")
 
-        val oldIndex = vaultFileDao.getAll().map { it.toDomainModel() }
-        val diff = ScanDiff(oldIndex, currentFiles).compute()
+            val oldIndex = vaultFileDao.getAll().map { it.toDomainModel() }
+            val diff = ScanDiff(oldIndex, currentFiles).compute()
 
-        // 1. Remove deleted files
-        if (diff.removed.isNotEmpty()) {
-            val removedPaths = diff.removed.map { it.path }
-            removedPaths.chunked(500).forEach { chunk ->
-                vaultFileDao.deleteByPaths(chunk)
-            }
-            Log.i(TAG, "Removed ${diff.removed.size} file(s) from DB")
-        }
-
-        // 2. Insert new files
-        if (diff.added.isNotEmpty()) {
-            val addedEntities = diff.added.map { it.toEntity() }
-            vaultFileDao.insertAll(addedEntities)
-            Log.i(TAG, "Added ${diff.added.size} file(s) to DB")
-        }
-
-        // 3. Update modified files
-        if (diff.modified.isNotEmpty()) {
-            for (mod in diff.modified) {
-                val existing = vaultFileDao.getByPath(mod.path)
-                if (existing != null) {
-                    vaultFileDao.update(
-                        existing.copy(
-                            size = mod.size,
-                            lastModified = mod.lastModified
-                        )
-                    )
-                } else {
-                    vaultFileDao.insert(mod.toEntity())
+            // 1. Remove deleted files
+            if (diff.removed.isNotEmpty()) {
+                val removedPaths = diff.removed.map { it.path }
+                removedPaths.chunked(500).forEach { chunk ->
+                    vaultFileDao.deleteByPaths(chunk)
                 }
+                Log.i(TAG, "Removed ${diff.removed.size} file(s) from DB")
             }
-            Log.i(TAG, "Updated ${diff.modified.size} file(s) in DB")
-        }
 
-        diff
+            // 2. Insert new files
+            if (diff.added.isNotEmpty()) {
+                val addedEntities = diff.added.map { it.toEntity() }
+                vaultFileDao.insertAll(addedEntities)
+                Log.i(TAG, "Added ${diff.added.size} file(s) to DB")
+            }
+
+            // 3. Update modified files
+            if (diff.modified.isNotEmpty()) {
+                for (mod in diff.modified) {
+                    val existing = vaultFileDao.getByPath(mod.path)
+                    if (existing != null) {
+                        vaultFileDao.update(
+                            existing.copy(
+                                size = mod.size,
+                                lastModified = mod.lastModified
+                            )
+                        )
+                    } else {
+                        vaultFileDao.insert(mod.toEntity())
+                    }
+                }
+                Log.i(TAG, "Updated ${diff.modified.size} file(s) in DB")
+            }
+
+            diff
+        }
     }
 
     // ── Import Operations ──────────────────────────────────────────────
@@ -331,10 +336,15 @@ class VaultRepositoryImpl @Inject constructor(
 
     override fun getVaultRootPath(): String = storage.getRootPath()
 
+    override fun getActiveVaultPath(): String = storage.getInternalVaultPath()
+
     override fun getStorageMode(): StorageMode = storageModeManager.getMode()
 
     override fun setStorageMode(mode: StorageMode) {
         storageModeManager.setMode(mode)
+        if (fileObserverManager.isWatching()) {
+            startWatching()
+        }
     }
 
     override fun resolveCollision(path: String): String = storage.resolveCollision(path)

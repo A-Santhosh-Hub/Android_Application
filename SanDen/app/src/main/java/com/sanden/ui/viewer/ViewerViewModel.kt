@@ -50,14 +50,14 @@ class ViewerViewModel @Inject constructor(
 
     fun deleteFile(file: VaultFile, onComplete: () -> Unit) {
         viewModelScope.launch {
-            deleteFilesUseCase(listOf(file))
+            deleteFilesUseCase(listOf(file)).collect { }
             onComplete()
         }
     }
 
     fun exportFile(file: VaultFile) {
         viewModelScope.launch {
-            exportFileUseCase(file)
+            exportFileUseCase(file).collect { }
         }
     }
 }

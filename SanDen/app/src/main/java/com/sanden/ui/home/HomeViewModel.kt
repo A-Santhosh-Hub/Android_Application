@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sanden.domain.model.FileCategory
+import com.sanden.domain.model.StorageMode
 import com.sanden.domain.model.VaultFile
 import com.sanden.domain.repository.VaultRepository
 import com.sanden.domain.usecase.GetCategoryStatsUseCase
@@ -52,6 +53,9 @@ class HomeViewModel @Inject constructor(
     val vaultPath: String
         get() = vaultRepository.getVaultRootPath()
 
+    val storageMode: StorageMode
+        get() = vaultRepository.getStorageMode()
+
     init {
         rescan()
     }
@@ -74,8 +78,13 @@ class HomeViewModel @Inject constructor(
     fun importFiles(uris: List<Uri>) {
         viewModelScope.launch {
             _isScanning.value = true
+            _error.value = null
             try {
-                importFilesUseCase(uris, "")
+                importFilesUseCase(uris, "").collect { op ->
+                    if (op.error != null) {
+                        _error.value = op.error
+                    }
+                }
                 scanVaultUseCase()
             } catch (e: Exception) {
                 _error.value = e.message

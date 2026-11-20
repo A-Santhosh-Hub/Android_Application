@@ -3,6 +3,7 @@ package com.sanden.di
 import android.content.Context
 import androidx.room.Room
 import com.sanden.data.db.SanDenDatabase
+import com.sanden.data.db.SyncMessageDao
 import com.sanden.data.db.VaultFileDao
 import dagger.Module
 import dagger.Provides
@@ -37,5 +38,13 @@ object DatabaseModule {
         database: SanDenDatabase
     ): VaultFileDao {
         return database.vaultFileDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSyncMessageDao(
+        database: SanDenDatabase
+    ): SyncMessageDao {
+        return database.syncMessageDao()
     }
 }

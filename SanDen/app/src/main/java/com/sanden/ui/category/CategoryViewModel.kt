@@ -111,7 +111,7 @@ class CategoryViewModel @Inject constructor(
         val toDelete = _selectedFiles.value.toList()
         if (toDelete.isEmpty()) return
         viewModelScope.launch {
-            deleteFilesUseCase(toDelete)
+            deleteFilesUseCase(toDelete).collect { }
             clearSelection()
             scanVaultUseCase()
         }
@@ -122,7 +122,7 @@ class CategoryViewModel @Inject constructor(
         if (toExport.isEmpty()) return
         viewModelScope.launch {
             for (file in toExport) {
-                exportFileUseCase(file)
+                exportFileUseCase(file).collect { }
             }
             clearSelection()
         }

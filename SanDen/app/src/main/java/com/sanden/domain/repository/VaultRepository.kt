@@ -92,8 +92,11 @@ interface VaultRepository {
 
     // ── Configuration & Sync ───────────────────────────────────────────
 
-    /** Absolute path of the vault root directory. */
+    /** Absolute path of the public drop folder / vault root directory. */
     fun getVaultRootPath(): String
+
+    /** Absolute path of the active storage directory (drop folder in Mode A, internal vault in Mode B). */
+    fun getActiveVaultPath(): String
 
     /** Current storage mode. */
     fun getStorageMode(): StorageMode

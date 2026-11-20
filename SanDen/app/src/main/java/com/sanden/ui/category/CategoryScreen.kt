@@ -47,9 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sanden.domain.model.VaultFile
 import com.sanden.ui.components.EmptyState
+import com.sanden.ui.components.AuroraGlassBackground
+import com.sanden.ui.components.EmptyState
 import com.sanden.ui.components.FileCard
 import com.sanden.ui.components.SanDenSearchBar
 import com.sanden.ui.components.SortMenu
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +71,8 @@ fun CategoryScreen(
     val isSelectionMode = selectedFiles.isNotEmpty()
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
-    Scaffold(
+    AuroraGlassBackground(modifier = modifier) {
+        Scaffold(
         topBar = {
             if (isSelectionMode) {
                 TopAppBar(
@@ -124,13 +128,12 @@ fun CategoryScreen(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = Color.Transparent
                     )
                 )
             }
         },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier
+        containerColor = Color.Transparent
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -223,5 +226,6 @@ fun CategoryScreen(
                 }
             }
         )
+    }
     }
 }

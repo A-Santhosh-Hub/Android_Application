@@ -79,9 +79,14 @@ class PrivateImportStorage @Inject constructor(
         progressCallback: (Float) -> Unit
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val destDir = File(internalVault, destFolder).also { it.mkdirs() }
+            val destDir = resolveDestDir(internalVault, destFolder).also { it.mkdirs() }
             val fileName = resolveFileNameFromUri(sourceUri)
                 ?: "imported_${System.currentTimeMillis()}"
+            val knownSize = resolveFileSizeFromUri(sourceUri)
+            if (knownSize > 0) {
+                SafeFileOperations.ensureSufficientSpace(destDir, knownSize)
+                    .onFailure { return@withContext Result.failure(it) }
+            }
 
             var destFile = File(destDir, fileName)
             destFile = SafeFileOperations.resolveNameCollision(destFile)
@@ -92,9 +97,8 @@ class PrivateImportStorage @Inject constructor(
                 )
 
             inputStream.use { input ->
-                val size = input.available().toLong().coerceAtLeast(-1L)
                 destFile.outputStream().buffered().use { output ->
-                    SafeFileOperations.streamCopy(input, output, size, BUFFER_SIZE, progressCallback)
+                    SafeFileOperations.streamCopy(input, output, knownSize, BUFFER_SIZE, progressCallback)
                 }
             }
 
@@ -375,6 +379,27 @@ class PrivateImportStorage @Inject constructor(
         // Remove source directory if empty
         if (sourceDir.listFiles()?.isEmpty() == true) {
             sourceDir.delete()
+        }
+    }
+
+    private fun resolveDestDir(baseDir: File, destFolder: String): File {
+        if (destFolder.isBlank()) return baseDir
+        val candidate = File(destFolder)
+        return if (candidate.isAbsolute) candidate else File(baseDir, destFolder)
+    }
+
+    private fun resolveFileSizeFromUri(uri: Uri): Long {
+        return try {
+            context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.SIZE), null, null, null)?.use { cursor ->
+                val sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                if (sizeIndex >= 0 && cursor.moveToFirst() && !cursor.isNull(sizeIndex)) {
+                    cursor.getLong(sizeIndex)
+                } else {
+                    -1L
+                }
+            } ?: -1L
+        } catch (e: Exception) {
+            -1L
         }
     }
 

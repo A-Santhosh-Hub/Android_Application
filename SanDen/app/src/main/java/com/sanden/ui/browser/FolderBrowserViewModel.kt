@@ -41,7 +41,7 @@ class FolderBrowserViewModel @Inject constructor(
     private val scanVaultUseCase: ScanVaultUseCase
 ) : ViewModel() {
 
-    val rootPath: String = vaultRepository.getVaultRootPath()
+    val rootPath: String = vaultRepository.getActiveVaultPath()
 
     private val _currentPath = MutableStateFlow(
         savedStateHandle.get<String>("path")?.takeIf { it.isNotBlank() } ?: rootPath
@@ -160,7 +160,7 @@ class FolderBrowserViewModel @Inject constructor(
         val toDelete = _selectedFiles.value.toList()
         if (toDelete.isEmpty()) return
         viewModelScope.launch {
-            deleteFilesUseCase(toDelete)
+            deleteFilesUseCase(toDelete).collect { }
             clearSelection()
             scanVaultUseCase()
         }
@@ -171,7 +171,7 @@ class FolderBrowserViewModel @Inject constructor(
         if (toExport.isEmpty()) return
         viewModelScope.launch {
             for (file in toExport) {
-                exportFileUseCase(file)
+                exportFileUseCase(file).collect { }
             }
             clearSelection()
         }
@@ -179,7 +179,7 @@ class FolderBrowserViewModel @Inject constructor(
 
     fun importFiles(uris: List<Uri>) {
         viewModelScope.launch {
-            importFilesUseCase(uris, _currentPath.value)
+            importFilesUseCase(uris, _currentPath.value).collect { }
             scanVaultUseCase()
         }
     }

@@ -1,10 +1,14 @@
 package com.sanden.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +42,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +60,12 @@ import com.sanden.ui.theme.CategoryDocument
 import com.sanden.ui.theme.CategoryDocumentContainer
 import com.sanden.ui.theme.CategoryOther
 import com.sanden.ui.theme.CategoryOtherContainer
+import com.sanden.ui.theme.GlassBorderBottomDark
+import com.sanden.ui.theme.GlassBorderBottomLight
+import com.sanden.ui.theme.GlassBorderTopDark
+import com.sanden.ui.theme.GlassBorderTopLight
+import com.sanden.ui.theme.GlassSurfaceDark
+import com.sanden.ui.theme.GlassSurfaceLight
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -109,32 +121,47 @@ private fun GridFileCard(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    val isDark = isSystemInDarkTheme()
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 0.96f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "gridCardScale"
+    )
+    val glassBg = if (isSelected) {
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+    } else if (isDark) {
+        GlassSurfaceDark
+    } else {
+        GlassSurfaceLight
+    }
+    val shape = RoundedCornerShape(22.dp)
+    val defaultBorderBrush = Brush.verticalGradient(
+        if (isDark) listOf(GlassBorderTopDark, GlassBorderBottomDark)
+        else listOf(GlassBorderTopLight, GlassBorderBottomLight)
+    )
+
+    Box(
         modifier = modifier
+            .scale(scale)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .border(2.dp, borderColor, RoundedCornerShape(18.dp))
+            .clip(shape)
+            .background(glassBg)
+            .then(
+                if (isSelected) Modifier.border(2.dp, borderColor, shape)
+                else Modifier.border(1.dp, defaultBorderBrush, shape)
+            )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
-            ),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            )
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
                 contentAlignment = Alignment.Center
             ) {
                 FileThumbnail(file = file, modifier = Modifier.fillMaxSize())
@@ -152,11 +179,11 @@ private fun GridFileCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(12.dp)
             ) {
                 Text(
                     text = file.name,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -183,24 +210,39 @@ private fun ListFileCard(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    val isDark = isSystemInDarkTheme()
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 0.98f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "listCardScale"
+    )
+    val glassBg = if (isSelected) {
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+    } else if (isDark) {
+        GlassSurfaceDark
+    } else {
+        GlassSurfaceLight
+    }
+    val shape = RoundedCornerShape(20.dp)
+    val defaultBorderBrush = Brush.verticalGradient(
+        if (isDark) listOf(GlassBorderTopDark, GlassBorderBottomDark)
+        else listOf(GlassBorderTopLight, GlassBorderBottomLight)
+    )
+
+    Box(
         modifier = modifier
+            .scale(scale)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, borderColor, RoundedCornerShape(16.dp))
+            .clip(shape)
+            .background(glassBg)
+            .then(
+                if (isSelected) Modifier.border(2.dp, borderColor, shape)
+                else Modifier.border(1.dp, defaultBorderBrush, shape)
+            )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            )
     ) {
         Row(
             modifier = Modifier

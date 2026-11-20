@@ -1,26 +1,34 @@
 package com.sanden.ui.navigation
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.sanden.domain.model.FileCategory
+import com.sanden.domain.model.VaultFile
 import com.sanden.ui.browser.FolderBrowserScreen
 import com.sanden.ui.category.CategoryScreen
+import com.sanden.ui.connect.ConnectScreen
 import com.sanden.ui.home.HomeScreen
 import com.sanden.ui.onboarding.OnboardingScreen
 import com.sanden.ui.settings.SettingsScreen
 import com.sanden.ui.viewer.AudioPlayerScreen
 import com.sanden.ui.viewer.ImageViewerScreen
 import com.sanden.ui.viewer.VideoPlayerScreen
+import java.io.File
 
 sealed class Screen(val route: String) {
     data object Onboarding : Screen("onboarding")
@@ -41,6 +49,7 @@ sealed class Screen(val route: String) {
         fun createRoute(fileId: Long) = "audio_player/$fileId"
     }
     data object Settings : Screen("settings")
+    data object Connect : Screen("connect")
 }
 
 @Composable
@@ -49,6 +58,16 @@ fun SanDenNavGraph(
     startDestination: String,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val openFile: (VaultFile) -> Unit = { file ->
+        when (file.category) {
+            FileCategory.IMAGE -> navController.navigate(Screen.ImageViewer.createRoute(file.id))
+            FileCategory.VIDEO -> navController.navigate(Screen.VideoPlayer.createRoute(file.id))
+            FileCategory.AUDIO -> navController.navigate(Screen.AudioPlayer.createRoute(file.id))
+            else -> openFileWithChooser(context, file)
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -76,17 +95,13 @@ fun SanDenNavGraph(
                 onBrowseFoldersClick = {
                     navController.navigate(Screen.FolderBrowser.createRoute())
                 },
+                onConnectClick = {
+                    navController.navigate(Screen.Connect.route)
+                },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
                 },
-                onFileClick = { file ->
-                    when (file.category) {
-                        FileCategory.IMAGE -> navController.navigate(Screen.ImageViewer.createRoute(file.id))
-                        FileCategory.VIDEO -> navController.navigate(Screen.VideoPlayer.createRoute(file.id))
-                        FileCategory.AUDIO -> navController.navigate(Screen.AudioPlayer.createRoute(file.id))
-                        else -> { /* Handled via FileProvider Intent */ }
-                    }
-                }
+                onFileClick = openFile
             )
         }
 
@@ -96,14 +111,7 @@ fun SanDenNavGraph(
         ) {
             CategoryScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onFileClick = { file ->
-                    when (file.category) {
-                        FileCategory.IMAGE -> navController.navigate(Screen.ImageViewer.createRoute(file.id))
-                        FileCategory.VIDEO -> navController.navigate(Screen.VideoPlayer.createRoute(file.id))
-                        FileCategory.AUDIO -> navController.navigate(Screen.AudioPlayer.createRoute(file.id))
-                        else -> { /* Intent chooser */ }
-                    }
-                }
+                onFileClick = openFile
             )
         }
 
@@ -122,14 +130,7 @@ fun SanDenNavGraph(
                 onFolderClick = { folderPath ->
                     navController.navigate(Screen.FolderBrowser.createRoute(folderPath))
                 },
-                onFileClick = { file ->
-                    when (file.category) {
-                        FileCategory.IMAGE -> navController.navigate(Screen.ImageViewer.createRoute(file.id))
-                        FileCategory.VIDEO -> navController.navigate(Screen.VideoPlayer.createRoute(file.id))
-                        FileCategory.AUDIO -> navController.navigate(Screen.AudioPlayer.createRoute(file.id))
-                        else -> { /* Intent chooser */ }
-                    }
-                }
+                onFileClick = openFile
             )
         }
 
@@ -165,5 +166,34 @@ fun SanDenNavGraph(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
+
+        composable(Screen.Connect.route) {
+            ConnectScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+    }
+}
+
+private fun openFileWithChooser(context: Context, file: VaultFile) {
+    try {
+        val targetFile = File(file.path)
+        if (!targetFile.exists()) {
+            Toast.makeText(context, "File not found: ${file.name}", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            targetFile
+        )
+        val mime = file.mimeType ?: "*/*"
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, mime)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(intent, "Open ${file.name}"))
+    } catch (e: Exception) {
+        Toast.makeText(context, "No app found to open ${file.name}", Toast.LENGTH_SHORT).show()
     }
 }

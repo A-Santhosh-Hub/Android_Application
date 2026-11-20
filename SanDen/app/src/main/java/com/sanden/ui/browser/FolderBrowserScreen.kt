@@ -57,6 +57,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sanden.domain.model.VaultFile
 import com.sanden.ui.components.BreadcrumbBar
 import com.sanden.ui.components.EmptyState
+import com.sanden.ui.components.AuroraGlassBackground
 import com.sanden.ui.components.FileCard
 import com.sanden.ui.components.SortMenu
 import java.io.File
@@ -110,7 +111,8 @@ fun FolderBrowserScreen(
         File(currentPath).name
     }
 
-    Scaffold(
+    AuroraGlassBackground(modifier = modifier) {
+        Scaffold(
         topBar = {
             if (isSelectionMode) {
                 TopAppBar(
@@ -187,7 +189,7 @@ fun FolderBrowserScreen(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = Color.Transparent
                     )
                 )
             }
@@ -206,8 +208,7 @@ fun FolderBrowserScreen(
                 )
             }
         },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier
+        containerColor = Color.Transparent
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -390,5 +391,6 @@ fun FolderBrowserScreen(
                 }
             }
         )
+    }
     }
 }

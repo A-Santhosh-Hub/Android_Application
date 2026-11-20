@@ -86,6 +86,7 @@ class FileObserverManager @Inject constructor() {
      * If already watching, the previous session is stopped first.
      */
     fun startWatching(path: String) {
+        if (watching && rootPath == path) return
         if (watching) stopWatching()
 
         rootPath = path

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SanDen Continuity Hub</title>
+<style>
+  :root {
+    --bg: #060913;
+    --glass: rgba(18, 26, 46, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --primary: #82b1ff;
+    --secondary: #4db6ac;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --phone-bubble: rgba(130, 177, 255, 0.16);
+    --laptop-bubble: rgba(77, 182, 172, 0.22);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(130,177,255,0.18), transparent 45%),
+      radial-gradient(circle at 85% 45%, rgba(77,182,172,0.14), transparent 45%),
+      radial-gradient(circle at 25% 90%, rgba(251,191,36,0.10), transparent 40%);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    background: rgba(6, 9, 19, 0.65);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.15rem; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 600;
+    background: rgba(77, 182, 172, 0.18);
+    border: 1px solid rgba(77, 182, 172, 0.35);
+    color: var(--secondary);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary); }
+  .dot.offline { background: #f87171; }
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 18px;
+    padding: 18px 24px;
+    max-width: 1360px;
+    width: 100%;
+    margin: 0 auto;
+    height: calc(100vh - 68px);
+  }
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; height: auto; }
+  }
+  .glass-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    backdrop-filter: blur(24px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title { font-weight: 600; font-size: 0.98rem; }
+  .btn {
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.84rem;
+    font-weight: 600;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .btn:hover { background: rgba(255,255,255,0.14); }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary {
+    background: var(--primary);
+    color: #06132b;
+    border-color: transparent;
+  }
+  .btn-primary:hover { background: #9ec3ff; }
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .msg {
+    max-width: 82%;
+    padding: 12px 15px;
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+    word-break: break-word;
+    line-height: 1.45;
+    font-size: 0.92rem;
+  }
+  .msg.PHONE { align-self: flex-start; background: var(--phone-bubble); border-bottom-left-radius: 6px; }
+  .msg.LAPTOP { align-self: flex-end; background: var(--laptop-bubble); border-bottom-right-radius: 6px; }
+  .msg-meta {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    margin-top: 6px; font-size: 0.72rem; color: var(--muted);
+  }
+  .copy-link { color: var(--primary); cursor: pointer; font-weight: 600; }
+  .composer {
+    padding: 14px;
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  textarea {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    color: var(--text);
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    resize: none;
+    height: 44px;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--primary); }
+  .drop-zone {
+    margin: 14px 16px 0;
+    padding: 18px;
+    border: 1.5px dashed rgba(130, 177, 255, 0.4);
+    border-radius: 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .drop-zone.dragover {
+    background: rgba(130, 177, 255, 0.12);
+    border-color: var(--primary);
+    color: var(--text);
+  }
+  #vaultList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .vault-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .vault-item-name { font-size: 0.88rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vault-item-sub { font-size: 0.74rem; color: var(--muted); }
+  #uploadStatus { padding: 8px 16px; font-size: 0.8rem; color: var(--secondary); display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span>🛡️ SanDen Continuity Hub</span>
+  </div>
+  <div class="pill">
+    <span class="dot" id="wsDot"></span>
+    <span id="wsStatus">Connecting...</span>
+  </div>
+</header>
+
+<main>
+  <!-- Left: Live Chat & Clipboard Stream -->
+  <section class="glass-card">
+    <div class="card-header">
+      <span class="card-title">Phone ↔ Laptop Stream</span>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="sendClipboard()">📋 Send Laptop Clipboard</button>
+      </div>
+    </div>
+    <div id="messages"></div>
+    <div class="composer">
+      <textarea id="msgInput" placeholder="Type a note, link, or code snippet... (Enter to send)"></textarea>
+      <input type="file" id="fileInput" multiple style="display:none" />
+      <button class="btn" onclick="document.getElementById('fileInput').click()">📎 File</button>
+      <button class="btn btn-primary" onclick="sendText()">Send</button>
+    </div>
+  </section>
+
+  <!-- Right: Drag & Drop Upload + SanDen Vault Browser -->
+  <section class="glass-card">
+    <div class="card-header">
+      <span class="card-title">SanDen Vault Files</span>
+      <button class="btn" onclick="loadVaultFiles()">↻ Refresh</button>
+    </div>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      Drag & drop images, videos, APKs, or any file here to save directly into your phone's <b>SanDen Vault</b>
+    </div>
+    <div id="uploadStatus"></div>
+    <div id="vaultList"></div>
+  </section>
+</main>
+
+<script>
+const messagesEl = document.getElementById('messages');
+const vaultListEl = document.getElementById('vaultList');
+const msgInput = document.getElementById('msgInput');
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const uploadStatus = document.getElementById('uploadStatus');
+const wsDot = document.getElementById('wsDot');
+const wsStatus = document.getElementById('wsStatus');
+
+function fmtSize(b) {
+  if (!b || b <= 0) return '0 B';
+  const u = ['B','KB','MB','GB'];
+  const i = Math.min(Math.floor(Math.log(b)/Math.log(1024)), u.length-1);
+  return (b / Math.pow(1024, i)).toFixed(1) + ' ' + u[i];
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderMessages(list) {
+  messagesEl.innerHTML = '';
+  for (const m of list) appendMessage(m, false);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function appendMessage(m, scroll = true) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + (m.sender || 'PHONE');
+  let body = '';
+  if (m.type === 'FILE') {
+    body = `<div>📁 <b>${escapeHtml(m.fileName)}</b> (${fmtSize(m.fileSize)})</div>`;
+  } else {
+    const badge = m.type === 'CLIPBOARD' ? '<span style="color:var(--secondary);font-size:0.75rem;font-weight:700;">📋 CLIPBOARD</span><br>' : '';
+    body = `${badge}<div style="white-space:pre-wrap;">${escapeHtml(m.textContent)}</div>`;
+  }
+  const time = new Date(m.timestamp || Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  const copyBtn = m.type !== 'FILE' ? `<span class="copy-link" onclick='copyText(${JSON.stringify(m.textContent || "")})'>Copy</span>` : '';
+  div.innerHTML = `${body}<div class="msg-meta"><span>${m.sender} • ${time}</span>${copyBtn}</div>`;
+  messagesEl.appendChild(div);
+  if (scroll) messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); } catch(e) {}
+}
+
+async function loadMessages() {
+  const res = await fetch('/api/messages');
+  const data = await res.json();
+  renderMessages(data);
+}
+
+async function loadVaultFiles() {
+  const res = await fetch('/api/vault/files');
+  const files = await res.json();
+  vaultListEl.innerHTML = files.length ? '' : '<div style="color:var(--muted);text-align:center;padding:24px;">No files in vault yet.</div>';
+  for (const f of files) {
+    if (f.isDirectory) continue;
+    const row = document.createElement('div');
+    row.className = 'vault-item';
+    row.innerHTML = `
+      <div style="min-width:0;flex:1;">
+        <div class="vault-item-name">${escapeHtml(f.name)}</div>
+        <div class="vault-item-sub">${escapeHtml(f.category)} • ${fmtSize(f.size)}</div>
+      </div>
+      <a class="btn" style="text-decoration:none;" href="/api/vault/download?id=${f.id}" download>⬇ Save</a>
+    `;
+    vaultListEl.appendChild(row);
+  }
+}
+
+async function sendText(type = 'TEXT', overrideText = null) {
+  const text = overrideText !== null ? overrideText : msgInput.value.trim();
+  if (!text) return;
+  if (overrideText === null) msgInput.value = '';
+  await fetch('/api/messages', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ sender: 'LAPTOP', type, textContent: text })
+  });
+}
+
+async function sendClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) await sendText('CLIPBOARD', text);
+  } catch (e) {
+    alert('Allow clipboard permission in browser, or paste into the box.');
+  }
+}
+
+async function uploadFiles(fileList) {
+  if (!fileList || !fileList.length) return;
+  uploadStatus.style.display = 'block';
+  for (let i = 0; i < fileList.length; i++) {
+    const f = fileList[i];
+    uploadStatus.textContent = `Sending ${f.name} (${i+1}/${fileList.length})...`;
+    await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'X-File-Name': encodeURIComponent(f.name) },
+      body: f
+    });
+  }
+  uploadStatus.textContent = `Sent ${fileList.length} file(s) to SanDen Vault!`;
+  setTimeout(() => uploadStatus.style.display = 'none', 3000);
+  loadVaultFiles();
+}
+
+msgInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendText();
+  }
+});
+fileInput.addEventListener('change', (e) => uploadFiles(e.target.files));
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  uploadFiles(e.dataTransfer.files);
+});
+
+function connectWs() {
+  const proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+  const ws = new WebSocket(proto + location.host + '/ws');
+  ws.onopen = () => { wsDot.classList.remove('offline'); wsStatus.textContent = 'Connected to Phone'; };
+  ws.onclose = () => { wsDot.classList.add('offline'); wsStatus.textContent = 'Reconnecting...'; setTimeout(connectWs, 2000); };
+  ws.onmessage = (ev) => {
+    try {
+      const msg = JSON.parse(ev.data);
+      appendMessage(msg);
+      if (msg.sender === 'PHONE' && msg.type === 'CLIPBOARD' && msg.textContent) {
+        copyText(msg.textContent);
+      }
+      if (msg.type === 'FILE') loadVaultFiles();
+    } catch(e) {}
+  };
+}
+
+loadMessages();
+loadVaultFiles();
+connectWs();
+</script>
+</body>
+</html>

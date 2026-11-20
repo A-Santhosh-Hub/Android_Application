@@ -62,22 +62,25 @@ class DropFolderStorage @Inject constructor(
         progressCallback: (Float) -> Unit
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val destDir = File(rootDir, destFolder).also { it.mkdirs() }
+            val destDir = resolveDestDir(rootDir, destFolder).also { it.mkdirs() }
 
-            // Resolve file name from URI
+            // Resolve file name and size from URI
             val fileName = resolveFileNameFromUri(sourceUri) ?: "imported_${System.currentTimeMillis()}"
+            val knownSize = resolveFileSizeFromUri(sourceUri)
+            if (knownSize > 0) {
+                SafeFileOperations.ensureSufficientSpace(destDir, knownSize)
+                    .onFailure { return@withContext Result.failure(it) }
+            }
+
             var destFile = File(destDir, fileName)
             destFile = SafeFileOperations.resolveNameCollision(destFile)
 
-            // Check space
             val inputStream = context.contentResolver.openInputStream(sourceUri)
                 ?: return@withContext Result.failure(IllegalStateException("Cannot open URI: $sourceUri"))
 
             inputStream.use { input ->
-                // We don't know the size from a URI easily; pass -1
-                val available = input.available().toLong().coerceAtLeast(-1L)
                 destFile.outputStream().buffered().use { output ->
-                    SafeFileOperations.streamCopy(input, output, available, BUFFER_SIZE, progressCallback)
+                    SafeFileOperations.streamCopy(input, output, knownSize, BUFFER_SIZE, progressCallback)
                 }
             }
 
@@ -297,6 +300,27 @@ class DropFolderStorage @Inject constructor(
     }
 
     // ── Private helpers ─────────────────────────────────────────────────
+
+    private fun resolveDestDir(baseDir: File, destFolder: String): File {
+        if (destFolder.isBlank()) return baseDir
+        val candidate = File(destFolder)
+        return if (candidate.isAbsolute) candidate else File(baseDir, destFolder)
+    }
+
+    private fun resolveFileSizeFromUri(uri: Uri): Long {
+        return try {
+            context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.SIZE), null, null, null)?.use { cursor ->
+                val sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                if (sizeIndex >= 0 && cursor.moveToFirst() && !cursor.isNull(sizeIndex)) {
+                    cursor.getLong(sizeIndex)
+                } else {
+                    -1L
+                }
+            } ?: -1L
+        } catch (e: Exception) {
+            -1L
+        }
+    }
 
     private fun resolveFileNameFromUri(uri: Uri): String? {
         // Try to get display name from content resolver
